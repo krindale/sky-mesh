@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter run:*)",
+      "Bash(ren:*)",
+      "Bash(mv:*)",
+      "Bash(for weather in cloudy foggy rainy snowy sunny sunset)",
+      "Bash(do mv \"cairo_pyramids_of_giza_$weather_lowpoly_00001_.png\" \"cairo_$weather.png\")",
+      "Bash(done)",
+      "Bash(do mv \"istanbul_hagia_sophia_$weather_lowpoly_00001_.png\" \"istanbul_$weather.png\")",
+      "Bash(do mv \"tehran_azadi_tower_$weather_lowpoly_00001_.png\" \"tehran_$weather.png\")",
+      "Bash(do mv \"dubai_burj_khalifa_$weather_lowpoly_00001_.png\" \"dubai_$weather.png\")",
+      "Bash(do mv \"bangalore_vidhana_soudha_$weather_lowpoly_00001_.png\" \"bangalore_$weather.png\")",
+      "Bash(do mv \"bangkok_wat_arun_$weather_lowpoly_00001_.png\" \"bangkok_$weather.png\")",
+      "Bash(do mv \"beijing_forbidden_city_$weather_lowpoly_00001_.png\" \"beijing_$weather.png\")",
+      "Bash(do mv \"seoul_n_seoul_tower_$weather_lowpoly_00001_.png\" \"seoul_$weather.png\")",
+      "Bash(do mv \"sydney_sydney_opera_house_$weather_lowpoly_00001_.png\" \"sydney_$weather.png\")",
+      "Bash(flutter clean:*)",
+      "Bash(flutter pub:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "defaultMode": "acceptEdits"
+  }
+}
