@@ -34,6 +34,11 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  
+  # Weather and location services
+  geolocator: ^10.1.0
+  http: ^1.1.2
+  permission_handler: ^11.1.0
 
 dev_dependencies:
   flutter_test:
@@ -62,22 +67,14 @@ flutter:
     - assets/
     - assets/clouds/
     - assets/location_images/
-    - assets/location_images/timezones/
-    - assets/location_images/timezones/utc_minus_3/
-    - assets/location_images/timezones/utc_minus_5/
-    - assets/location_images/timezones/utc_minus_6/
-    - assets/location_images/timezones/utc_minus_8/
-    - assets/location_images/timezones/utc_plus_0/
-    - assets/location_images/timezones/utc_plus_1/
-    - assets/location_images/timezones/utc_plus_2/
-    - assets/location_images/timezones/utc_plus_3/
-    - assets/location_images/timezones/utc_plus_3_30/
-    - assets/location_images/timezones/utc_plus_4/
-    - assets/location_images/timezones/utc_plus_5_30/
-    - assets/location_images/timezones/utc_plus_7/
-    - assets/location_images/timezones/utc_plus_8/
-    - assets/location_images/timezones/utc_plus_9/
-    - assets/location_images/timezones/utc_plus_10/
+    - assets/location_images/regions/
+    - assets/location_images/regions/asia/
+    - assets/location_images/regions/middle_east/
+    - assets/location_images/regions/europe/
+    - assets/location_images/regions/north_america/
+    - assets/location_images/regions/south_america/
+    - assets/location_images/regions/africa/
+    - assets/location_images/regions/oceania/
     - assets/location_images/regional_fallback/
     - assets/location_images/regional_fallback/central_asia/
     - assets/location_images/regional_fallback/china_inland/

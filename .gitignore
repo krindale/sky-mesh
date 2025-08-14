@@ -58,3 +58,7 @@ assets/clouds/**/*
 # Alternative: ignore specific image types
 # assets/location_images/**/*.png
 # assets/clouds/**/*.png
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
+nul
+macos/Flutter/GeneratedPluginRegistrant.swift

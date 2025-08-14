@@ -14,23 +14,15 @@ class ImageAssets {
     'sunset',
   ];
   
-  // 시간대별 도시들
-  static const Map<String, List<String>> timezonesCities = {
-    'utc_minus_3': ['buenos_aires', 'rio_de_janeiro', 'santiago', 'sao_paulo'],
-    'utc_minus_5': ['boston', 'miami', 'new_york', 'toronto', 'washington_dc'],
-    'utc_minus_6': ['chicago', 'mexico_city'],
-    'utc_minus_8': ['los_angeles', 'san_francisco', 'seattle', 'vancouver'],
-    'utc_plus_0': ['casablanca', 'london'],
-    'utc_plus_1': ['amsterdam', 'barcelona', 'berlin', 'paris', 'prague', 'rome', 'stockholm', 'vienna', 'zurich'],
-    'utc_plus_2': ['cairo', 'johannesburg', 'tel_aviv'],
-    'utc_plus_3': ['istanbul', 'moscow', 'nairobi', 'riyadh'],
-    'utc_plus_3_30': ['tehran'],
-    'utc_plus_4': ['dubai'],
-    'utc_plus_5_30': ['bangalore', 'mumbai'],
-    'utc_plus_7': ['bangkok', 'ho_chi_minh', 'jakarta'],
-    'utc_plus_8': ['beijing', 'kuala_lumpur', 'manila', 'singapore'],
-    'utc_plus_9': ['seoul', 'tokyo'],
-    'utc_plus_10': ['sydney'],
+  // 지역별 도시들
+  static const Map<String, List<String>> regionCities = {
+    'asia': ['seoul', 'tokyo', 'beijing', 'bangkok', 'singapore', 'manila', 'jakarta', 'kuala_lumpur', 'ho_chi_minh', 'bangalore', 'mumbai'],
+    'middle_east': ['dubai', 'tehran', 'riyadh', 'tel_aviv'],
+    'europe': ['paris', 'london', 'berlin', 'rome', 'amsterdam', 'barcelona', 'prague', 'stockholm', 'vienna', 'zurich', 'moscow', 'istanbul'],
+    'north_america': ['new_york', 'los_angeles', 'san_francisco', 'seattle', 'chicago', 'boston', 'miami', 'washington_dc', 'toronto', 'vancouver', 'mexico_city'],
+    'south_america': ['buenos_aires', 'rio_de_janeiro', 'santiago', 'sao_paulo'],
+    'africa': ['cairo', 'johannesburg', 'nairobi', 'casablanca'],
+    'oceania': ['sydney'],
   };
   
   // 지역별 fallback 이미지들
@@ -51,11 +43,11 @@ class ImageAssets {
   static List<String> getAllImagePaths() {
     List<String> allPaths = [];
     
-    // 시간대별 도시 이미지들 추가
-    timezonesCities.forEach((timezone, cities) {
+    // 지역별 도시 이미지들 추가
+    regionCities.forEach((region, cities) {
       for (String city in cities) {
         for (String weather in weatherTypes) {
-          allPaths.add('$_baseLocationPath/timezones/$timezone/${city}_$weather.png');
+          allPaths.add('$_baseLocationPath/regions/$region/${city}_$weather.png');
         }
       }
     });
@@ -85,10 +77,10 @@ class ImageAssets {
     
     List<String> weatherPaths = [];
     
-    // 시간대별 도시 이미지들에서 해당 날씨 찾기
-    timezonesCities.forEach((timezone, cities) {
+    // 지역별 도시 이미지들에서 해당 날씨 찾기
+    regionCities.forEach((region, cities) {
       for (String city in cities) {
-        weatherPaths.add('$_baseLocationPath/timezones/$timezone/${city}_$weather.png');
+        weatherPaths.add('$_baseLocationPath/regions/$region/${city}_$weather.png');
       }
     });
     
@@ -107,10 +99,10 @@ class ImageAssets {
       return null;
     }
     
-    // 시간대별로 도시 찾기
-    for (MapEntry<String, List<String>> entry in timezonesCities.entries) {
+    // 지역별로 도시 찾기
+    for (MapEntry<String, List<String>> entry in regionCities.entries) {
       if (entry.value.contains(city)) {
-        return '$_baseLocationPath/timezones/${entry.key}/${city}_$weather.png';
+        return '$_baseLocationPath/regions/${entry.key}/${city}_$weather.png';
       }
     }
     
