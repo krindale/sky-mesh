@@ -15,6 +15,8 @@ class LocationImageService {
     'ho_chi_minh': ['ho_chi_minh'],
     'bangalore': ['bangalore'],
     'mumbai': ['mumbai'],
+    'shanghai': ['shanghai'],
+    'taipei': ['taipei'],
     
     // 중동
     'dubai': ['dubai'],
@@ -60,9 +62,11 @@ class LocationImageService {
     'johannesburg': ['johannesburg'],
     'nairobi': ['nairobi'],
     'casablanca': ['casablanca'],
+    'lagos': ['lagos'],
     
     // 오세아니아
     'sydney': ['sydney'],
+    'melbourne': ['melbourne'],
   };
 
   // 도시별 위도/경도 정보 (거리 계산용)
@@ -79,6 +83,8 @@ class LocationImageService {
     'ho_chi_minh': [10.8231, 106.6297],
     'bangalore': [12.9716, 77.5946],
     'mumbai': [19.0760, 72.8777],
+    'shanghai': [31.2304, 121.4737],
+    'taipei': [25.0330, 121.5654],
     
     // 중동
     'dubai': [25.2048, 55.2708],
@@ -124,9 +130,11 @@ class LocationImageService {
     'johannesburg': [-26.2041, 28.0473],
     'nairobi': [-1.2921, 36.8219],
     'casablanca': [33.5731, -7.5898],
+    'lagos': [6.5244, 3.3792],
     
     // 오세아니아
     'sydney': [-33.8688, 151.2093],
+    'melbourne': [-37.8136, 144.9631],
   };
 
   // 국가별 도시 매핑 (우선순위 2)
@@ -134,7 +142,7 @@ class LocationImageService {
     // 아시아
     'KR': ['seoul'], 
     'JP': ['tokyo'],
-    'CN': ['beijing'],
+    'CN': ['beijing', 'shanghai'],
     'TH': ['bangkok'],
     'SG': ['singapore'],
     'PH': ['manila'],
@@ -142,6 +150,7 @@ class LocationImageService {
     'MY': ['kuala_lumpur'],
     'VN': ['ho_chi_minh'],
     'IN': ['bangalore', 'mumbai'],
+    'TW': ['taipei'],
     
     // 중동
     'AE': ['dubai'],
@@ -178,9 +187,10 @@ class LocationImageService {
     'ZA': ['johannesburg'],
     'KE': ['nairobi'],
     'MA': ['casablanca'],
+    'NG': ['lagos'],
     
     // 오세아니아
-    'AU': ['sydney'],
+    'AU': ['sydney', 'melbourne'],
   };
 
   // 지역별 폴백 이미지 (실제 존재하는 폴더만) (우선순위 3)
@@ -189,6 +199,7 @@ class LocationImageService {
     'KR': 'southeast_asia_extended',
     'CN': 'china_inland', 
     'JP': 'southeast_asia_extended',
+    'TW': 'southeast_asia_extended',
     
     // 동남아시아
     'TH': 'southeast_asia_extended',
