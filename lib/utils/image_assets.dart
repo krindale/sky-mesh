@@ -16,13 +16,13 @@ class ImageAssets {
   
   // 지역별 도시들
   static const Map<String, List<String>> regionCities = {
-    'asia': ['seoul', 'tokyo', 'beijing', 'bangkok', 'singapore', 'manila', 'jakarta', 'kuala_lumpur', 'ho_chi_minh', 'bangalore', 'mumbai'],
+    'asia': ['seoul', 'tokyo', 'beijing', 'bangkok', 'singapore', 'manila', 'jakarta', 'kuala_lumpur', 'ho_chi_minh', 'bangalore', 'mumbai', 'shanghai', 'taipei'],
     'middle_east': ['dubai', 'tehran', 'riyadh', 'tel_aviv'],
     'europe': ['paris', 'london', 'berlin', 'rome', 'amsterdam', 'barcelona', 'prague', 'stockholm', 'vienna', 'zurich', 'moscow', 'istanbul'],
     'north_america': ['new_york', 'los_angeles', 'san_francisco', 'seattle', 'chicago', 'boston', 'miami', 'washington_dc', 'toronto', 'vancouver', 'mexico_city'],
     'south_america': ['buenos_aires', 'rio_de_janeiro', 'santiago', 'sao_paulo'],
-    'africa': ['cairo', 'johannesburg', 'nairobi', 'casablanca'],
-    'oceania': ['sydney'],
+    'africa': ['cairo', 'johannesburg', 'nairobi', 'casablanca', 'lagos'],
+    'oceania': ['sydney', 'melbourne'],
   };
   
   // 지역별 fallback 이미지들
