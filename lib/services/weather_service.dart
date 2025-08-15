@@ -8,6 +8,7 @@ class WeatherService {
   // OpenWeatherMap API key
   static const String _apiKey = 'a179131038d53e44738851b4938c5cd0';
   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
+  static const String _forecastUrl = 'https://api.openweathermap.org/data/2.5/forecast';
 
   // 랜덤 도시 목록 (위도, 경도, 도시명, 국가코드)
   static const List<List<dynamic>> _randomCities = [
@@ -139,6 +140,44 @@ class WeatherService {
     }
   }
 
+  Future<HourlyWeatherData> getHourlyWeather() async {
+    try {
+      Position position = await _getCurrentLocation();
+      
+      final response = await http.get(
+        Uri.parse('$_forecastUrl?lat=${position.latitude}&lon=${position.longitude}&appid=$_apiKey&units=metric'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return HourlyWeatherData.fromJson(data);
+      } else {
+        throw Exception('Failed to load hourly weather data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading hourly weather: $e');
+      return _getMockHourlyWeatherData();
+    }
+  }
+
+  Future<HourlyWeatherData> getHourlyWeatherByCoordinates(double latitude, double longitude) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_forecastUrl?lat=$latitude&lon=$longitude&appid=$_apiKey&units=metric'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return HourlyWeatherData.fromJson(data);
+      } else {
+        throw Exception('Failed to load hourly weather data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading hourly weather by coordinates: $e');
+      return _getMockHourlyWeatherData();
+    }
+  }
+
   Future<Position> _getCurrentLocation() async {
     // Check if running on web and provide specific guidance
     if (kIsWeb) {
@@ -204,6 +243,7 @@ class WeatherService {
       pressure: 1013,
       visibility: 10000,
       uvIndex: 5,
+      airQuality: 2,
       latitude: 37.5665,
       longitude: 126.9780,
     );
@@ -239,8 +279,121 @@ class WeatherService {
       pressure: 980 + Random().nextInt(60), // 980-1040 hPa
       visibility: 5000 + Random().nextInt(10000), // 5-15km
       uvIndex: Random().nextInt(11), // 0-10
+      airQuality: 1 + Random().nextInt(5), // 1-5 (Good to Hazardous)
       latitude: cityData[0],
       longitude: cityData[1],
+    );
+  }
+
+  HourlyWeatherData _getMockHourlyWeatherData() {
+    final now = DateTime.now();
+    final hourlyForecasts = <HourlyWeatherForecast>[];
+    
+    final weatherOptions = [
+      'Clear Sky', 'Few Clouds', 'Scattered Clouds', 'Broken Clouds', 
+      'Overcast Clouds', 'Light Rain', 'Rain', 'Heavy Rain', 
+      'Snow', 'Mist', 'Fog'
+    ];
+    
+    final iconOptions = [
+      '01d', '02d', '03d', '04d', '09d', '10d', '11d', '13d', '50d'
+    ];
+    
+    for (int i = 0; i < 24; i++) {
+      final forecastTime = now.add(Duration(hours: i));
+      final baseTemp = 15 + Random().nextInt(20); // 15-35도
+      final tempVariation = Random().nextInt(6) - 3; // -3~+3도 변화
+      
+      hourlyForecasts.add(HourlyWeatherForecast(
+        dateTime: forecastTime,
+        temperature: (baseTemp + tempVariation).toDouble(),
+        description: weatherOptions[Random().nextInt(weatherOptions.length)],
+        iconCode: iconOptions[Random().nextInt(iconOptions.length)],
+        humidity: 30 + Random().nextInt(60),
+        windSpeed: Random().nextDouble() * 8,
+        pressure: 980 + Random().nextInt(60),
+      ));
+    }
+    
+    return HourlyWeatherData(
+      cityName: 'Seoul',
+      country: 'KR',
+      hourlyForecasts: hourlyForecasts,
+    );
+  }
+
+  Future<WeeklyWeatherData> getWeeklyWeather() async {
+    try {
+      Position position = await _getCurrentLocation();
+      
+      final response = await http.get(
+        Uri.parse('$_forecastUrl?lat=${position.latitude}&lon=${position.longitude}&appid=$_apiKey&units=metric'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return WeeklyWeatherData.fromJson(data);
+      } else {
+        throw Exception('Failed to load weekly weather data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading weekly weather: $e');
+      return _getMockWeeklyWeatherData();
+    }
+  }
+
+  Future<WeeklyWeatherData> getWeeklyWeatherByCoordinates(double latitude, double longitude) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_forecastUrl?lat=$latitude&lon=$longitude&appid=$_apiKey&units=metric'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return WeeklyWeatherData.fromJson(data);
+      } else {
+        throw Exception('Failed to load weekly weather data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading weekly weather by coordinates: $e');
+      return _getMockWeeklyWeatherData();
+    }
+  }
+
+  WeeklyWeatherData _getMockWeeklyWeatherData() {
+    final now = DateTime.now();
+    final weeklyForecasts = <DailyWeatherForecast>[];
+    
+    final weatherOptions = [
+      'Clear Sky', 'Few Clouds', 'Scattered Clouds', 'Broken Clouds', 
+      'Overcast Clouds', 'Light Rain', 'Rain', 'Snow', 'Mist'
+    ];
+    
+    final iconOptions = [
+      '01d', '02d', '03d', '04d', '09d', '10d', '11d', '13d', '50d'
+    ];
+    
+    for (int i = 0; i < 7; i++) {
+      final forecastDate = now.add(Duration(days: i));
+      final baseTemp = 15 + Random().nextInt(15); // 15-30도
+      final tempVariation = Random().nextInt(8) + 5; // 5-12도 차이
+      
+      weeklyForecasts.add(DailyWeatherForecast(
+        date: forecastDate,
+        maxTemperature: (baseTemp + tempVariation).toDouble(),
+        minTemperature: baseTemp.toDouble(),
+        description: weatherOptions[Random().nextInt(weatherOptions.length)],
+        iconCode: iconOptions[Random().nextInt(iconOptions.length)],
+        humidity: 30 + Random().nextInt(60),
+        windSpeed: Random().nextDouble() * 8,
+        pressure: 980 + Random().nextInt(60),
+      ));
+    }
+    
+    return WeeklyWeatherData(
+      cityName: 'Seoul',
+      country: 'KR',
+      dailyForecasts: weeklyForecasts,
     );
   }
 }
@@ -257,6 +410,7 @@ class WeatherData {
   final int pressure;
   final int visibility;
   final int uvIndex;
+  final int airQuality; // 대기질 추가
   final double? latitude;
   final double? longitude;
 
@@ -272,6 +426,7 @@ class WeatherData {
     required this.pressure,
     required this.visibility,
     required this.uvIndex,
+    required this.airQuality,
     this.latitude,
     this.longitude,
   });
@@ -289,6 +444,7 @@ class WeatherData {
       pressure: json['main']['pressure'],
       visibility: json['visibility'] ?? 10000,
       uvIndex: 5, // UV index requires separate API call
+      airQuality: 2, // Air quality - mock data (1-5 scale)
       latitude: json['coord']['lat']?.toDouble(),
       longitude: json['coord']['lon']?.toDouble(),
     );
@@ -301,10 +457,209 @@ class WeatherData {
   String get pressureString => '${pressure} hPa';
   String get visibilityString => '${(visibility / 1000).toStringAsFixed(1)} km';
   String get uvIndexString => uvIndex.toString();
+  String get airQualityString => airQuality.toString();
+  
+  // 숫자와 단위 분리된 버전
+  String get windSpeedNumber => windSpeed.toStringAsFixed(1);
+  String get windSpeedUnit => 'm/s';
+  String get humidityNumber => humidity.toString();
+  String get humidityUnit => '%';
+  String get pressureNumber => pressure.toString();
+  String get pressureUnit => 'hPa';
+  String get visibilityNumber => (visibility / 1000).toStringAsFixed(1);
+  String get visibilityUnit => 'km';
   
   String get capitalizedDescription {
     return description.split(' ').map((word) => 
       word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : word
     ).join(' ');
+  }
+}
+
+class HourlyWeatherData {
+  final String cityName;
+  final String country;
+  final List<HourlyWeatherForecast> hourlyForecasts;
+
+  HourlyWeatherData({
+    required this.cityName,
+    required this.country,
+    required this.hourlyForecasts,
+  });
+
+  factory HourlyWeatherData.fromJson(Map<String, dynamic> json) {
+    final List<dynamic> list = json['list'];
+    final hourlyForecasts = list.take(24).map((item) => 
+      HourlyWeatherForecast.fromJson(item)
+    ).toList();
+    
+    return HourlyWeatherData(
+      cityName: json['city']['name'],
+      country: json['city']['country'],
+      hourlyForecasts: hourlyForecasts,
+    );
+  }
+}
+
+class HourlyWeatherForecast {
+  final DateTime dateTime;
+  final double temperature;
+  final String description;
+  final String iconCode;
+  final int humidity;
+  final double windSpeed;
+  final int pressure;
+
+  HourlyWeatherForecast({
+    required this.dateTime,
+    required this.temperature,
+    required this.description,
+    required this.iconCode,
+    required this.humidity,
+    required this.windSpeed,
+    required this.pressure,
+  });
+
+  factory HourlyWeatherForecast.fromJson(Map<String, dynamic> json) {
+    return HourlyWeatherForecast(
+      dateTime: DateTime.fromMillisecondsSinceEpoch(json['dt'] * 1000),
+      temperature: json['main']['temp'].toDouble(),
+      description: json['weather'][0]['description'],
+      iconCode: json['weather'][0]['icon'],
+      humidity: json['main']['humidity'],
+      windSpeed: json['wind']['speed'].toDouble(),
+      pressure: json['main']['pressure'],
+    );
+  }
+
+  String get temperatureString => '${temperature.round()}°';
+  String get hour => '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  
+  String get capitalizedDescription {
+    return description.split(' ').map((word) => 
+      word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : word
+    ).join(' ');
+  }
+}
+
+class WeeklyWeatherData {
+  final String cityName;
+  final String country;
+  final List<DailyWeatherForecast> dailyForecasts;
+
+  WeeklyWeatherData({
+    required this.cityName,
+    required this.country,
+    required this.dailyForecasts,
+  });
+
+  factory WeeklyWeatherData.fromJson(Map<String, dynamic> json) {
+    final List<dynamic> list = json['list'];
+    
+    // 5일 예보 데이터를 일별로 그룹화 (하루에 8개 데이터: 3시간 간격)
+    final Map<String, List<dynamic>> dailyData = {};
+    
+    for (var item in list) {
+      final dt = DateTime.fromMillisecondsSinceEpoch(item['dt'] * 1000);
+      final dateKey = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+      
+      if (!dailyData.containsKey(dateKey)) {
+        dailyData[dateKey] = [];
+      }
+      dailyData[dateKey]!.add(item);
+    }
+    
+    final dailyForecasts = <DailyWeatherForecast>[];
+    
+    // 일별 데이터에서 최고/최저 온도 계산
+    for (var entry in dailyData.entries) {
+      if (dailyForecasts.length >= 7) break; // 최대 7일
+      
+      final dayData = entry.value;
+      if (dayData.isEmpty) continue;
+      
+      double maxTemp = dayData.first['main']['temp_max'].toDouble();
+      double minTemp = dayData.first['main']['temp_min'].toDouble();
+      String description = dayData.first['weather'][0]['description'];
+      String iconCode = dayData.first['weather'][0]['icon'];
+      
+      // 하루 중 최고/최저 온도 찾기
+      for (var data in dayData) {
+        maxTemp = [maxTemp, data['main']['temp_max'].toDouble()].reduce((a, b) => a > b ? a : b);
+        minTemp = [minTemp, data['main']['temp_min'].toDouble()].reduce((a, b) => a < b ? a : b);
+      }
+      
+      // 낮 시간대의 날씨 정보 사용 (12시 근처)
+      var noonData = dayData.firstWhere(
+        (data) {
+          final dt = DateTime.fromMillisecondsSinceEpoch(data['dt'] * 1000);
+          return dt.hour >= 12 && dt.hour <= 15;
+        },
+        orElse: () => dayData.first,
+      );
+      
+      description = noonData['weather'][0]['description'];
+      iconCode = noonData['weather'][0]['icon'];
+      
+      dailyForecasts.add(DailyWeatherForecast(
+        date: DateTime.fromMillisecondsSinceEpoch(dayData.first['dt'] * 1000),
+        maxTemperature: maxTemp,
+        minTemperature: minTemp,
+        description: description,
+        iconCode: iconCode,
+        humidity: noonData['main']['humidity'],
+        windSpeed: noonData['wind']['speed'].toDouble(),
+        pressure: noonData['main']['pressure'],
+      ));
+    }
+    
+    return WeeklyWeatherData(
+      cityName: json['city']['name'],
+      country: json['city']['country'],
+      dailyForecasts: dailyForecasts,
+    );
+  }
+}
+
+class DailyWeatherForecast {
+  final DateTime date;
+  final double maxTemperature;
+  final double minTemperature;
+  final String description;
+  final String iconCode;
+  final int humidity;
+  final double windSpeed;
+  final int pressure;
+
+  DailyWeatherForecast({
+    required this.date,
+    required this.maxTemperature,
+    required this.minTemperature,
+    required this.description,
+    required this.iconCode,
+    required this.humidity,
+    required this.windSpeed,
+    required this.pressure,
+  });
+
+  String get maxTemperatureString => '${maxTemperature.round()}°';
+  String get minTemperatureString => '${minTemperature.round()}°';
+  
+  String get dayOfWeek {
+    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+    return weekdays[date.weekday % 7];
+  }
+  
+  String get dateString => '${date.month}/${date.day}';
+  
+  String get capitalizedDescription {
+    return description.split(' ').map((word) => 
+      word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : word
+    ).join(' ');
+  }
+  
+  bool get isToday {
+    final now = DateTime.now();
+    return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 }
