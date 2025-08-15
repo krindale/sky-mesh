@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 import 'design_system/design_system.dart';
 import 'widgets/background_image_widget.dart';
 import 'utils/image_assets.dart';
@@ -43,9 +44,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   // Weather related variables
   final WeatherService _weatherService = WeatherService();
   WeatherData? _currentWeather;
+  HourlyWeatherData? _hourlyWeather;
+  WeeklyWeatherData? _weeklyWeather;
   bool _isLoadingWeather = true;
   String? _weatherError;
   bool _isCurrentLocation = true; // 현재 위치 표시 여부 추적
+  Timer? _autoRefreshTimer; // 자동 갱신 타이머
+  final ScrollController _scrollController = ScrollController(); // 스크롤 컨트롤러 추가
 
   @override
   void initState() {
@@ -66,11 +71,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     currentImagePath = ImageAssets.getRandomImagePath();
     
     _loadWeatherData();
+    _startAutoRefreshTimer(); // 자동 갱신 타이머 시작
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _autoRefreshTimer?.cancel(); // 타이머 정리
+    _scrollController.dispose(); // 스크롤 컨트롤러 해제
     super.dispose();
   }
 
@@ -92,8 +100,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         longitude: weatherData.longitude,
       );
       
+      // 시간별 날씨와 일주일 날씨 데이터도 함께 로드
+      final hourlyWeatherData = await _weatherService.getHourlyWeather();
+      final weeklyWeatherData = await _weatherService.getWeeklyWeather();
+      
       setState(() {
         _currentWeather = weatherData;
+        _hourlyWeather = hourlyWeatherData;
+        _weeklyWeather = weeklyWeatherData;
         currentImagePath = newImagePath;
         _isLoadingWeather = false;
         _isCurrentLocation = true; // 현재 위치 로드됨
@@ -130,9 +144,29 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         longitude: randomWeatherData.longitude,
       );
       
+      // 랜덤 도시의 시간별 날씨와 일주일 날씨도 가져오기
+      HourlyWeatherData? randomHourlyWeather;
+      WeeklyWeatherData? randomWeeklyWeather;
+      try {
+        if (randomWeatherData.latitude != null && randomWeatherData.longitude != null) {
+          randomHourlyWeather = await _weatherService.getHourlyWeatherByCoordinates(
+            randomWeatherData.latitude!,
+            randomWeatherData.longitude!,
+          );
+          randomWeeklyWeather = await _weatherService.getWeeklyWeatherByCoordinates(
+            randomWeatherData.latitude!,
+            randomWeatherData.longitude!,
+          );
+        }
+      } catch (e) {
+        print('시간별/일주일 날씨 로드 실패: $e');
+      }
+      
       setState(() {
         nextImagePath = newImagePath;
         _currentWeather = randomWeatherData;
+        _hourlyWeather = randomHourlyWeather;
+        _weeklyWeather = randomWeeklyWeather;
         _isCurrentLocation = false; // 랜덤 도시로 변경됨
       });
       
@@ -142,6 +176,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           _isAnimating = false;
         });
         _animationController.reset();
+        
+        // 스크롤을 맨 위로 이동
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
       });
     } catch (e) {
       setState(() {
@@ -188,8 +231,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         longitude: updatedWeather.longitude,
       );
       
+      // 갱신된 시간별 날씨와 일주일 날씨도 함께 로드
+      HourlyWeatherData? updatedHourlyWeather;
+      WeeklyWeatherData? updatedWeeklyWeather;
+      try {
+        if (_isCurrentLocation) {
+          updatedHourlyWeather = await _weatherService.getHourlyWeather();
+          updatedWeeklyWeather = await _weatherService.getWeeklyWeather();
+        } else if (updatedWeather.latitude != null && updatedWeather.longitude != null) {
+          updatedHourlyWeather = await _weatherService.getHourlyWeatherByCoordinates(
+            updatedWeather.latitude!,
+            updatedWeather.longitude!,
+          );
+          updatedWeeklyWeather = await _weatherService.getWeeklyWeatherByCoordinates(
+            updatedWeather.latitude!,
+            updatedWeather.longitude!,
+          );
+        }
+      } catch (e) {
+        print('시간별/일주일 날씨 갱신 실패: $e');
+      }
+      
       setState(() {
         _currentWeather = updatedWeather;
+        _hourlyWeather = updatedHourlyWeather;
+        _weeklyWeather = updatedWeeklyWeather;
         currentImagePath = newImagePath;
         _isLoadingWeather = false;
       });
@@ -265,9 +331,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           SafeArea(
             child: WeatherDisplayWidget(
               weatherData: _currentWeather,
+              hourlyWeatherData: _hourlyWeather,
+              weeklyWeatherData: _weeklyWeather,
               isLoading: _isLoadingWeather,
               error: _weatherError,
               onRefresh: _refreshCurrentWeather,
+              scrollController: _scrollController,
             ),
           ),
         ],
@@ -317,5 +386,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+
+  void _startAutoRefreshTimer() {
+    // 30분마다 자동으로 현재 선택된 지역의 날씨를 갱신
+    _autoRefreshTimer = Timer.periodic(const Duration(minutes: 30), (timer) {
+      if (!_isLoadingWeather && _currentWeather != null) {
+        print('🔄 자동 날씨 갱신 시작 (30분 주기)');
+        _refreshCurrentWeather();
+      }
+    });
   }
 }
