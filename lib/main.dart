@@ -7,8 +7,14 @@ import 'utils/image_assets.dart';
 import 'services/weather_service.dart';
 import 'services/location_image_service.dart';
 import 'widgets/weather_display_widget.dart';
+import 'core/dependency_injection/service_locator.dart';
+import 'core/models/weather_data.dart';
+import 'core/models/hourly_weather_data.dart';
+import 'core/models/weekly_weather_data.dart';
 
 void main() {
+  // Initialize dependency injection following DIP
+  ServiceLocator().registerDependencies();
   runApp(const SkyMeshApp());
 }
 

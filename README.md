@@ -1,42 +1,252 @@
-# Sky Mesh
-스타일리시 한 날씨 모바일 앱 (Stylish Weather Mobile App)
+# 🌤️ SkyMesh - Intelligent Location-Based Weather App
 
-A Flutter application featuring global location backgrounds with low-poly design aesthetics.
+**Real-time weather information from anywhere in the world with beautiful low-poly backgrounds**
 
-## Features
+SkyMesh is a Flutter-based weather application that provides detailed weather information with customized background images tailored to your location and weather conditions.
 
-- 🌍 **Global Location Backgrounds**: 300+ location images from timezones and regions worldwide
-- 🎨 **Low Poly Design System**: Modern geometric design with cohesive color palette
-- ✨ **Smooth Animations**: 300ms fade transitions between background images
-- 🎯 **Interactive Experience**: Tap the shuffle button to explore random locations
-- 📱 **Cross-Platform**: Runs on Android, iOS, Web, and Desktop
+## 📱 Key Features
 
-## Getting Started
+### 🎯 Core Features
+- **Real-time Location-Based Weather**: Automatic GPS location detection and weather information
+- **Global Random City Explorer**: Explore weather from 68 major cities worldwide
+- **Intelligent Background Images**: Automatic background image matching based on location and weather conditions
+- **30-Minute Auto Refresh**: Automatic weather updates for selected regions
 
-### Prerequisites
-- Flutter 3.8.1 or higher
-- Dart SDK
+### 📊 Detailed Weather Information
+- **Current Weather**: Temperature, feels-like temperature, humidity, wind speed, pressure, visibility
+- **Hourly Forecast**: Detailed 24-hour forecast information
+- **7-Day Weather Forecast**: Weekly weather trends and high/low temperatures
+- **Air Quality Index**: Real-time air quality information (AQI)
+- **UV Index**: UV levels and exposure risk assessment
 
-### Installation
-1. Clone the repository
-2. Run `flutter pub get` to install dependencies
-3. Add your location images to the `assets/location_images/` directory
-4. Run `flutter run` to start the app
+## 🖼️ App Screenshots
 
-## Project Structure
+<div align="center">
+  <img src="sample_images/Screenshot_1755228803.png" width="45%" alt="Main Screen"/>
+  <img src="sample_images/Screenshot_1755228814.png" width="45%" alt="Hourly Forecast"/>
+</div>
+
+<div align="center">
+  <img src="sample_images/Screenshot_1755228818.png" width="45%" alt="7-Day Forecast"/>
+  <img src="sample_images/Screenshot_1755228822.png" width="45%" alt="Detailed Weather Information"/>
+</div>
+
+## ✨ Special Features
+
+### 🌍 Smart Location Recognition
+- **Automatic Location Detection**: Accurate current location tracking via GPS
+- **Global Support**: Support for 68 major cities worldwide
+- **Offline Resilience**: Stable service with mock data during network errors
+
+### 🎨 Beautiful UI/UX
+- **Low-Poly Design**: Modern and minimalist low-poly art style
+- **Context-Based Backgrounds**: Backgrounds reflecting location landmarks and weather conditions
+- **Smooth Animations**: Natural fade effects during screen transitions and data loading
+- **Intuitive Interface**: User-friendly information layout and visual elements
+
+### ⚡ Performance Optimization
+- **Efficient Memory Management**: Image caching and proper resource disposal
+- **Fast Response Times**: Optimized communication with OpenWeatherMap API
+- **Battery Efficiency**: Intelligent background update management
+
+### 🏗️ Clean Architecture
+- **SOLID Principles**: Complete adherence to all five SOLID principles
+- **Dependency Injection**: Modular dependency management with service locator
+- **Interface Segregation**: Small, focused interfaces for better maintainability
+- **Strategy Pattern**: Extensible weather data sources without code modification
+
+## 🛠️ Tech Stack
+
+### Framework & Language
+- **Flutter 3.8.1+**: Cross-platform mobile development
+- **Dart**: High-performance asynchronous programming
+
+### Key Libraries
+- **geolocator ^10.1.0**: GPS location services
+- **http ^1.1.2**: REST API communication
+- **permission_handler ^11.1.0**: System permission management
+
+### Architecture Patterns
+- **Repository Pattern**: Clean data access abstraction
+- **Strategy Pattern**: Pluggable weather data sources
+- **Dependency Injection**: Loose coupling and testability
+- **Facade Pattern**: Simplified API for complex subsystems
+
+### External APIs
+- **OpenWeatherMap API**: Real-time weather data and forecast information
+- **Custom Image Mapping System**: Location-specific background images
+
+## 📁 Project Structure
+
+### Clean Architecture with SOLID Principles
 
 ```
 lib/
-├── design_system/     # Low poly design system components
-├── utils/            # Image assets management
-├── widgets/          # Reusable UI components
-└── main.dart         # App entry point
+├── main.dart                          # App entry point with DI initialization
+├── core/                              # Core business logic (Clean Architecture)
+│   ├── interfaces/                    # Abstract interfaces (DIP)
+│   │   ├── weather_repository.dart    # Weather data abstraction
+│   │   ├── location_service.dart      # Location service interface
+│   │   ├── image_service.dart         # Image service interface
+│   │   └── weather_interfaces.dart    # ISP-compliant interfaces
+│   ├── models/                        # Domain models (SRP)
+│   │   ├── weather_data.dart          # Weather data model
+│   │   ├── hourly_weather_data.dart   # Hourly forecast model
+│   │   └── weekly_weather_data.dart   # Weekly forecast model
+│   ├── strategies/                    # Strategy pattern (OCP)
+│   │   └── weather_strategy.dart      # Pluggable weather strategies
+│   ├── dependency_injection/          # DI container (DIP)
+│   │   ├── service_locator.dart       # Service locator
+│   │   └── weather_module.dart        # Module configuration
+│   └── tests/                         # Contract tests (LSP)
+│       └── weather_repository_test.dart
+├── data/                              # Data layer implementations
+│   └── services/                      # Concrete implementations
+│       ├── openweather_api_service.dart  # OpenWeatherMap API
+│       ├── geolocator_service.dart       # GPS location service
+│       └── location_image_service_impl.dart # Image service impl
+├── services/                          # Facade layer (compatibility)
+│   ├── weather_service.dart          # Simplified weather facade
+│   └── location_image_service.dart    # Location-image mapping
+├── widgets/                           # Presentation layer
+│   ├── weather_display_widget.dart    # Weather UI components
+│   └── background_image_widget.dart   # Background management
+├── design_system/                     # UI design system
+│   └── design_system.dart            # Colors and themes
+└── utils/                             # Utility functions
+    └── image_assets.dart              # Asset management
 ```
 
-## Assets
+## 🚀 Installation and Setup
 
-Location images are organized by:
-- **Timezones**: `assets/location_images/timezones/utc_*/`
-- **Regional Fallbacks**: `assets/location_images/regional_fallback/*/`
+### Prerequisites
+- Flutter SDK 3.8.1 or higher
+- Android Studio or VS Code
+- Android/iOS development environment setup
 
-Image naming convention: `{city/region}_{weather}.png`
+### Installation Steps
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/krindale/sky_mesh.git
+   cd sky_mesh
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   flutter pub get
+   ```
+
+3. **Run the App**
+   ```bash
+   flutter run
+   ```
+
+### Development Environment
+- **Android**: Android 5.0 (API 21) or higher
+- **iOS**: iOS 12.0 or higher (future support planned)
+- **Permissions**: Location services, Internet connectivity
+
+## 🔧 API Configuration
+
+1. **Get OpenWeatherMap API Key**
+   - Sign up at [OpenWeatherMap](https://openweathermap.org/api)
+   - Generate API key
+
+2. **Environment Setup**
+   - Replace API key in `lib/data/services/openweather_api_service.dart`
+   - Or configure via `WeatherConfigurationService` in dependency injection
+   - Development API key is included in this project
+
+## 🏗️ Architecture Details
+
+### SOLID Principles Implementation
+
+#### 1. **Single Responsibility Principle (SRP)**
+- Each class has one reason to change
+- `WeatherRepository`: Only handles weather data operations
+- `LocationService`: Only manages location functionality
+- `ImageService`: Only handles image selection logic
+
+#### 2. **Open/Closed Principle (OCP)**
+- Open for extension, closed for modification
+- Strategy pattern allows adding new weather data sources
+- New location services can be added without changing existing code
+
+#### 3. **Liskov Substitution Principle (LSP)**
+- All implementations are substitutable for their interfaces
+- Contract tests ensure behavioral compatibility
+- Mock implementations maintain same contracts
+
+#### 4. **Interface Segregation Principle (ISP)**
+- Small, focused interfaces instead of large ones
+- `CurrentWeatherService`, `WeatherForecastService`, `RandomWeatherService`
+- Clients depend only on methods they actually use
+
+#### 5. **Dependency Inversion Principle (DIP)**
+- High-level modules don't depend on low-level modules
+- Both depend on abstractions (interfaces)
+- Dependency injection manages all dependencies
+
+### Design Patterns Used
+
+- **Repository Pattern**: Clean data access layer
+- **Strategy Pattern**: Pluggable weather data sources  
+- **Facade Pattern**: Simplified API for UI layer
+- **Dependency Injection**: Inversion of control container
+- **Factory Pattern**: Weather data object creation
+
+## 📈 Development Roadmap
+
+### Short-term Goals (1-2 months)
+- **iOS Platform Support** expansion
+- **Multi-language Support** (English, Chinese, Japanese)
+- **Widget Features** addition
+
+### Medium-term Goals (3-6 months)
+- **Weather Notification Service** implementation
+- **Personalized Weather Recommendations** feature
+- **Social Sharing** functionality
+
+### Long-term Goals (6+ months)
+- **AI-based Weather Prediction** enhancement
+- **Wearable Device Integration**
+- **Cloud Synchronization** services
+
+## 🤝 Contributing
+
+### How to Contribute
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Create Pull Request
+
+### Development Guidelines
+- **Code Style**: Follow Flutter/Dart official guidelines
+- **SOLID Principles**: Maintain clean architecture principles
+- **Testing**: Write unit tests and contract tests for new features
+- **Documentation**: Update README and comments when code changes
+- **Dependency Injection**: Use service locator for new dependencies
+
+### Code Quality Standards
+- **Architecture**: Follow Clean Architecture and SOLID principles
+- **Testing**: Minimum 80% code coverage with unit and integration tests
+- **Code Review**: All changes must pass architectural review
+- **Performance**: Maintain sub-3-second load times and efficient memory usage
+
+## 📝 License
+
+This project is distributed under the MIT License. See [LICENSE](LICENSE) file for details.
+
+## 📞 Contact
+
+**Developer**: krindale  
+**Email**: [Contact information to be added]  
+**GitHub**: [@krindale](https://github.com/krindale)
+
+---
+
+<div align="center">
+  <h3>🌟 Explore weather around the world with SkyMesh! 🌟</h3>
+  <p>A special journey combining real-time weather information with beautiful visual experiences</p>
+</div>

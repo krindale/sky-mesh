@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/weather_service.dart';
+import '../core/models/weather_data.dart';
+import '../core/models/hourly_weather_data.dart';
+import '../core/models/weekly_weather_data.dart';
 
 class WeatherDisplayWidget extends StatefulWidget {
   final WeatherData? weatherData;
