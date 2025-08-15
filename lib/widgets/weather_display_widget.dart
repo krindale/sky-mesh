@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import '../services/weather_service.dart';
 import '../design_system/design_system.dart';
 
-class WeatherDisplayWidget extends StatelessWidget {
+class WeatherDisplayWidget extends StatefulWidget {
   final WeatherData? weatherData;
   final bool isLoading;
   final String? error;
@@ -18,50 +18,113 @@ class WeatherDisplayWidget extends StatelessWidget {
   });
 
   @override
+  State<WeatherDisplayWidget> createState() => _WeatherDisplayWidgetState();
+}
+
+class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
+    with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    ));
+    
+    // 초기 데이터가 있으면 애니메이션 시작
+    if (widget.weatherData != null && !widget.isLoading) {
+      _fadeController.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(WeatherDisplayWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // 로딩 상태가 변경되었을 때 애니메이션 제어
+    if (oldWidget.isLoading != widget.isLoading) {
+      if (widget.isLoading) {
+        // 로딩 시작 시 페이드 아웃
+        _fadeController.reverse();
+      } else if (widget.weatherData != null) {
+        // 로딩 완료 시 페이드 인
+        _fadeController.forward();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     
-    if (isLoading) {
+    if (widget.isLoading) {
       return _buildLoadingState();
     }
     
-    if (error != null) {
+    if (widget.error != null) {
       return _buildErrorState();
     }
     
-    if (weatherData == null) {
+    if (widget.weatherData == null) {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      child: Stack(
-        children: [
-          // Main weather content
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top section with location and temperature
-              _buildTopSection(context),
-              
-              const SizedBox(height: 20),
-              
-              // Weather details cards
-              Expanded(
-                child: _buildWeatherDetailsCards(context),
+    return AnimatedBuilder(
+      animation: _fadeAnimation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _fadeAnimation.value,
+          child: Transform.translate(
+            offset: Offset(0, (1 - _fadeAnimation.value) * 20),
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              child: Stack(
+                children: [
+                  // Main weather content
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Top section with location and temperature
+                      _buildTopSection(context),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Weather details cards
+                      Expanded(
+                        child: _buildWeatherDetailsCards(context),
+                      ),
+                    ],
+                  ),
+                  
+                  // Refresh button
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: _buildRefreshButton(context),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-          
-          // Refresh button
-          Positioned(
-            top: 16,
-            right: 16,
-            child: _buildRefreshButton(context),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -117,7 +180,7 @@ class WeatherDisplayWidget extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              error ?? 'Unknown error occurred',
+              widget.error ?? 'Unknown error occurred',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.8),
                 fontSize: 14,
@@ -126,7 +189,7 @@ class WeatherDisplayWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: onRefresh,
+              onPressed: widget.onRefresh,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white.withOpacity(0.2),
                 foregroundColor: Colors.white,
@@ -150,7 +213,7 @@ class WeatherDisplayWidget extends StatelessWidget {
         children: [
           // Location
           Text(
-            '${weatherData!.cityName}, ${weatherData!.country}',
+            '${widget.weatherData!.cityName}, ${widget.weatherData!.country}',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -177,7 +240,7 @@ class WeatherDisplayWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                weatherData!.temperatureString,
+                widget.weatherData!.temperatureString,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 96,
@@ -192,7 +255,7 @@ class WeatherDisplayWidget extends StatelessWidget {
                   children: [
                     const SizedBox(height: 16),
                     Text(
-                      weatherData!.capitalizedDescription,
+                      widget.weatherData!.capitalizedDescription,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -201,7 +264,7 @@ class WeatherDisplayWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Feels like ${weatherData!.feelsLikeString}',
+                      'Feels like ${widget.weatherData!.feelsLikeString}',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
                         fontSize: 18,
@@ -230,7 +293,7 @@ class WeatherDisplayWidget extends StatelessWidget {
                 child: _buildWeatherCard(
                   icon: Icons.air,
                   title: 'WIND',
-                  value: weatherData!.windSpeedString,
+                  value: widget.weatherData!.windSpeedString,
                 ),
               ),
               const SizedBox(width: 12),
@@ -238,7 +301,7 @@ class WeatherDisplayWidget extends StatelessWidget {
                 child: _buildWeatherCard(
                   icon: Icons.water_drop_outlined,
                   title: 'HUMIDITY',
-                  value: weatherData!.humidityString,
+                  value: widget.weatherData!.humidityString,
                 ),
               ),
             ],
@@ -253,7 +316,7 @@ class WeatherDisplayWidget extends StatelessWidget {
                 child: _buildWeatherCard(
                   icon: Icons.speed,
                   title: 'PRESSURE',
-                  value: weatherData!.pressureString,
+                  value: widget.weatherData!.pressureString,
                 ),
               ),
               const SizedBox(width: 12),
@@ -261,7 +324,7 @@ class WeatherDisplayWidget extends StatelessWidget {
                 child: _buildWeatherCard(
                   icon: Icons.visibility,
                   title: 'VISIBILITY',
-                  value: weatherData!.visibilityString,
+                  value: widget.weatherData!.visibilityString,
                 ),
               ),
             ],
@@ -273,8 +336,8 @@ class WeatherDisplayWidget extends StatelessWidget {
           _buildWeatherCard(
             icon: Icons.wb_sunny_outlined,
             title: 'UV INDEX',
-            value: weatherData!.uvIndexString,
-            subtitle: _getUVIndexDescription(weatherData!.uvIndex),
+            value: widget.weatherData!.uvIndexString,
+            subtitle: _getUVIndexDescription(widget.weatherData!.uvIndex),
             isFullWidth: true,
           ),
         ],
@@ -361,7 +424,7 @@ class WeatherDisplayWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
-        onRefresh();
+        widget.onRefresh();
       },
       child: Container(
         width: 44,
