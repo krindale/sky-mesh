@@ -18,6 +18,56 @@ class LocationImageService {
     'shanghai': ['shanghai'],
     'taipei': ['taipei'],
     
+    // 베이징 하위 구들
+    'dongcheng': ['beijing'],    // 동성구
+    'xicheng': ['beijing'],     // 서성구
+    'chaoyang': ['beijing'],    // 조양구
+    'fengtai': ['beijing'],     // 풍대구
+    'shijingshan': ['beijing'], // 석경산구
+    'haidian': ['beijing'],     // 해정구
+    'mentougou': ['beijing'],   // 문두구
+    'fangshan': ['beijing'],    // 방산구
+    'tongzhou': ['beijing'],    // 통주구
+    'shunyi': ['beijing'],      // 순의구
+    'changping': ['beijing'],   // 창평구
+    'daxing': ['beijing'],      // 대흥구
+    'huairou': ['beijing'],     // 회유구
+    'pinggu': ['beijing'],      // 평곡구
+    'miyun': ['beijing'],       // 밀운구
+    'yanqing': ['beijing'],     // 연경구
+    
+    // 베이징 주변 지역들
+    'dayangfang': ['beijing'],  // 다양팡 (베이징 주변)
+    'beijing_suburb': ['beijing'], // 베이징 교외
+    'changping_county': ['beijing'], // 창평현
+    'shunyi_county': ['beijing'],   // 순의현
+    'daxing_county': ['beijing'],   // 대흥현
+    'fangshan_county': ['beijing'], // 방산현
+    'mentougou_county': ['beijing'], // 문두구현
+    'huairou_county': ['beijing'],  // 회유현
+    'pinggu_county': ['beijing'],   // 평곡현
+    'miyun_county': ['beijing'],    // 밀운현
+    'yanqing_county': ['beijing'],  // 연경현
+    
+    // 상하이 하위 구들
+    'huangpu': ['shanghai'],    // 황포구
+    'xuhui': ['shanghai'],      // 서휘구
+    'changning': ['shanghai'],  // 장녕구
+    'jingan': ['shanghai'],     // 정안구
+    'putuo': ['shanghai'],      // 보타구
+    'hongkou': ['shanghai'],    // 홍구구
+    'yangpu': ['shanghai'],     // 양포구
+    'minhang': ['shanghai'],    // 민행구
+    'baoshan': ['shanghai'],    // 보산구
+    'jiading': ['shanghai'],    // 가정구
+    'pudong': ['shanghai'],     // 포동신구
+    'jinshan': ['shanghai'],    // 금산구
+    'songjiang': ['shanghai'],  // 송강구
+    'qingpu': ['shanghai'],     // 청포구
+    'fengxian': ['shanghai'],   // 봉현구
+    'chongming': ['shanghai'],  // 숭명구
+    'luwan': ['shanghai'],      // 루완구 (현재는 황포구에 합병됨)
+    
     // 중동
     'dubai': ['dubai'],
     'tehran': ['tehran'],
@@ -141,6 +191,7 @@ class LocationImageService {
   static const Map<String, List<String>> _countryToCities = {
     // 아시아
     'KR': ['seoul'], 
+    'KP': ['seoul'],  // 북한
     'JP': ['tokyo'],
     'CN': ['beijing', 'shanghai'],
     'TH': ['bangkok'],
@@ -193,69 +244,148 @@ class LocationImageService {
     'AU': ['sydney', 'melbourne'],
   };
 
-  // 지역별 폴백 이미지 (실제 존재하는 폴더만) (우선순위 3)
+  // 중국 남부 지역 도시들 (광둥, 광시, 하이난, 푸젠, 홍콩, 마카오 등)
+  static const List<String> _southernChinaCities = [
+    'guangzhou', 'shenzhen', 'hong_kong', 'macau', 'xiamen', 'fuzhou', 
+    'nanning', 'haikou', 'sanya', 'zhuhai', 'foshan', 'dongguan'
+  ];
+
+  // 지역별 폴백 이미지 (지원 도시가 없는 국가들만) (우선순위 3)
   static const Map<String, String> _regionFallback = {
-    // 동아시아
-    'KR': 'southeast_asia_extended',
-    'CN': 'china_inland', 
-    'JP': 'southeast_asia_extended',
-    'TW': 'southeast_asia_extended',
+    // 남아시아 (지원 도시 없는 국가들)
+    'PK': 'northern_india',  // 파키스탄
+    'BD': 'northern_india',  // 방글라데시
+    'LK': 'northern_india',  // 스리랑카
+    'NP': 'northern_india',  // 네팔
+    'BT': 'northern_india',  // 부탄
+    'IN': 'northern_india',  // 인도 (뭄바이 외 지역)
     
-    // 동남아시아
-    'TH': 'southeast_asia_extended',
-    'VN': 'southeast_asia_extended',
-    'SG': 'southeast_asia_extended',
-    'MY': 'southeast_asia_extended',
-    'ID': 'southeast_asia_extended',
-    'PH': 'oceania_extended',
+    // 중앙아시아 (지원 도시 없는 국가들)
+    'AF': 'central_asia',    // 아프가니스탄
+    'UZ': 'central_asia',    // 우즈베키스탄
+    'KZ': 'central_asia',    // 카자흐스탄
+    'TM': 'central_asia',    // 투르크메니스탄
+    'TJ': 'central_asia',    // 타지키스탄
+    'KG': 'central_asia',    // 키르기스스탄
     
-    // 남아시아
-    'IN': 'northern_india',
-    'PK': 'northern_india',
-    'BD': 'northern_india',
+    // 동남아시아 (지원 도시 없는 국가들)
+    'LA': 'southeast_asia_extended', // 라오스
+    'KH': 'southeast_asia_extended', // 캄보디아
+    'MM': 'southeast_asia_extended', // 미얀마
+    'BN': 'southeast_asia_extended', // 브루나이
+    'TL': 'southeast_asia_extended', // 동티모르
     
-    // 중앙아시아
-    'IR': 'central_asia',
-    'AF': 'central_asia',
-    'UZ': 'central_asia',
-    'KZ': 'central_asia',
+    // 중동 (지원 도시 없는 국가들)  
+    'QA': 'middle_east',     // 카타르
+    'KW': 'middle_east',     // 쿠웨이트
+    'BH': 'middle_east',     // 바레인
+    'OM': 'middle_east',     // 오만
+    'JO': 'middle_east',     // 요단
+    'LB': 'middle_east',     // 레바논
+    'SY': 'middle_east',     // 시리아
+    'IQ': 'middle_east',     // 이라크
+    'YE': 'middle_east',     // 예멘
     
-    // 중동
-    'AE': 'central_asia',
-    'SA': 'central_asia',
-    'QA': 'central_asia',
+    // 북아프리카 (지원 도시 없는 국가들)
+    'LY': 'middle_east',     // 리비아
+    'TN': 'middle_east',     // 튀니지
+    'DZ': 'middle_east',     // 알제리
+    'SD': 'middle_east',     // 수단
+    'SS': 'middle_east',     // 남수단
     
-    // 아프리카
-    'EG': 'east_africa',
-    'ET': 'east_africa',
-    'KE': 'east_africa',
-    'NG': 'west_africa',
-    'GH': 'west_africa',
+    // 아프리카 (지원 도시 없는 국가들)
+    'ET': 'east_africa',     // 에티오피아
+    'TZ': 'east_africa',     // 탄자니아
+    'UG': 'east_africa',     // 우간다
+    'RW': 'east_africa',     // 르완다
+    'BI': 'east_africa',     // 부룬디
+    'ER': 'east_africa',     // 에리트레아
+    'DJ': 'east_africa',     // 지부티
+    'SO': 'east_africa',     // 소말리아
+    'BW': 'east_africa',     // 보츠와나
+    'NA': 'east_africa',     // 나미비아
+    'ZW': 'east_africa',     // 짐바브웨
+    'GH': 'west_africa',     // 가나
+    'SN': 'west_africa',     // 세네갈
+    'ML': 'west_africa',     // 말리
+    'BF': 'west_africa',     // 부르키나파소
+    'CI': 'west_africa',     // 코트디부아르
+    'LR': 'west_africa',     // 라이베리아
+    'SL': 'west_africa',     // 시에라리온
+    'GN': 'west_africa',     // 기니
+    'GW': 'west_africa',     // 기니비사우
+    'GM': 'west_africa',     // 감비아
+    'CV': 'west_africa',     // 카보베르데
+    'NE': 'west_africa',     // 니제르
+    'TG': 'west_africa',     // 토고
+    'BJ': 'west_africa',     // 베냉
+    'TD': 'west_africa',     // 차드
+    'CF': 'west_africa',     // 중앙아프리카공화국
+    'CM': 'west_africa',     // 카메룬
+    'CG': 'west_africa',     // 콩고공화국
+    'CD': 'west_africa',     // 콩고민주공화국
     
-    // 유럽 (존재하는 폴더로 매핑)
-    'FR': 'eastern_europe',
-    'DE': 'eastern_europe', 
-    'IT': 'eastern_europe',
-    'ES': 'eastern_europe',
-    'GB': 'eastern_europe',
-    'RU': 'eastern_europe',
-    'PL': 'eastern_europe',
-    'TR': 'eastern_europe',
+    // 유럽 (지원 도시 없는 국가들)
+    'PL': 'eastern_europe',  // 폴란드
+    'SK': 'eastern_europe',  // 슬로바키아
+    'HU': 'eastern_europe',  // 헝가리
+    'RO': 'eastern_europe',  // 루마니아
+    'BG': 'eastern_europe',  // 불가리아
+    'SI': 'eastern_europe',  // 슬로베니아
+    'HR': 'eastern_europe',  // 크로아티아
+    'BA': 'eastern_europe',  // 보스니아헤르체고비나
+    'RS': 'eastern_europe',  // 세르비아
+    'ME': 'eastern_europe',  // 몬테네그로
+    'MK': 'eastern_europe',  // 북마케도니아
+    'AL': 'eastern_europe',  // 알바니아
+    'XK': 'eastern_europe',  // 코소보
+    'EE': 'eastern_europe',  // 에스토니아
+    'LV': 'eastern_europe',  // 라트비아
+    'LT': 'eastern_europe',  // 리투아니아
+    'BY': 'eastern_europe',  // 벨라루스
+    'UA': 'eastern_europe',  // 우크라이나
+    'MD': 'eastern_europe',  // 몰도바
+    'CZ': 'eastern_europe',  // 체코
+    'NO': 'eastern_europe',  // 노르웨이
+    'DK': 'eastern_europe',  // 덴마크
+    'FI': 'eastern_europe',  // 핀란드
+    'IS': 'eastern_europe',  // 아이슬란드
+    'GR': 'eastern_europe',  // 그리스
+    'BE': 'eastern_europe',  // 벨기에
+    'IE': 'eastern_europe',  // 아일랜드
+    'PT': 'eastern_europe',  // 포르투갈
     
-    // 북미 (존재하는 폴더로 매핑)
-    'US': 'central_asia', // 임시로 central_asia 사용
-    'CA': 'central_asia', // 임시로 central_asia 사용
-    'MX': 'northern_andes',
+    // 남미 (지원 도시 없는 국가들)
+    'CO': 'northern_andes',  // 콜롬비아
+    'PE': 'northern_andes',  // 페루
+    'EC': 'northern_andes',  // 에콰도르
+    'VE': 'northern_andes',  // 베네수엘라
+    'BO': 'northern_andes',  // 볼리비아
+    'PA': 'northern_andes',  // 파나마
+    'CU': 'northern_andes',  // 쿠바
+    'JM': 'northern_andes',  // 자메이카
+    'DO': 'northern_andes',  // 도미니카공화국
+    'GT': 'northern_andes',  // 과테말라
+    'CR': 'northern_andes',  // 코스타리카
+    'NI': 'northern_andes',  // 니카라과
     
-    // 남미
-    'BR': 'northern_andes', // south_america 폴더가 없어서 northern_andes 사용
-    'AR': 'northern_andes', // south_america 폴더가 없어서 northern_andes 사용
-    'CO': 'northern_andes',
-    'PE': 'northern_andes',
+    // 오세아니아 (지원 도시 없는 국가들)
+    'NZ': 'oceania_extended', // 뉴질랜드
+    'FJ': 'oceania_extended', // 피지
+    'PG': 'oceania_extended', // 파푸아뉴기니
+    'VU': 'oceania_extended', // 바누아투
+    'SB': 'oceania_extended', // 솔로몬 제도
+    'WS': 'oceania_extended', // 사모아
+    'TO': 'oceania_extended', // 통가
+    'PW': 'oceania_extended', // 팔라우
+    'FM': 'oceania_extended', // 미크로네시아
+    'MH': 'oceania_extended', // 마셜 제도
+    'NR': 'oceania_extended', // 나우루
+    'KI': 'oceania_extended', // 키리바시
+    'TV': 'oceania_extended', // 투발루
     
-    // 오세아니아
-    'AU': 'oceania_extended',
-    'NZ': 'oceania_extended',
+    // 중국은 특별 처리 유지 (베이징/상하이 외 도시들을 위한 지역별 폴백)
+    'CN': 'china_inland',
   };
 
   // 날씨 상태 매핑
@@ -307,28 +437,45 @@ class LocationImageService {
     if (_countryToCities.containsKey(countryCode)) {
       final countryCities = _countryToCities[countryCode]!;
       
-      // 2a. 위치정보 있으면 같은 나라에서 가장 가까운 도시
-      if (latitude != null && longitude != null) {
-        final nearestCity = _findNearestCity(latitude, longitude, candidateCities: countryCities);
-        final cityImageNames = _cityImages[nearestCity]!;
+      // 중국의 경우: 특별한 지역별 처리를 위해 조건부 스킵
+      if (countryCode == 'CN' && !countryCities.contains(cityKey)) {
+        // 중국이지만 지원하지 않는 도시인 경우, 지역 폴백으로 넘어감
+        print('🇨🇳 Unsupported Chinese city, checking regional fallback...');
+      } 
+      // 인도의 경우: 방갈로르/뭄바이가 아닌 도시는 지역 폴백 사용
+      else if (countryCode == 'IN' && !countryCities.contains(cityKey)) {
+        // 인도이지만 방갈로르/뭄바이가 아닌 경우, 지역 폴백으로 넘어감
+        print('🇮🇳 Non-Bangalore/Mumbai Indian city, using regional fallback...');
+      } else {
+        // 2a. 위치정보 있으면 같은 나라에서 가장 가까운 도시
+        if (latitude != null && longitude != null) {
+          final nearestCity = _findNearestCity(latitude, longitude, candidateCities: countryCities);
+          final cityImageNames = _cityImages[nearestCity]!;
+          final selectedCityImage = cityImageNames[Random().nextInt(cityImageNames.length)];
+          final imagePath = _buildImagePath(selectedCityImage, weather, latitude: latitude, longitude: longitude);
+          print('✅ [2a] Same country nearest city: $imagePath');
+          return imagePath;
+        }
+        
+        // 2b. 위치정보 없으면 같은 나라의 랜덤 도시
+        final selectedCity = countryCities[Random().nextInt(countryCities.length)];
+        final cityImageNames = _cityImages[selectedCity]!;
         final selectedCityImage = cityImageNames[Random().nextInt(cityImageNames.length)];
         final imagePath = _buildImagePath(selectedCityImage, weather, latitude: latitude, longitude: longitude);
-        print('✅ [2a] Same country nearest city: $imagePath');
+        print('✅ [2b] Same country random city: $imagePath');
         return imagePath;
       }
-      
-      // 2b. 위치정보 없으면 같은 나라의 랜덤 도시
-      final selectedCity = countryCities[Random().nextInt(countryCities.length)];
-      final cityImageNames = _cityImages[selectedCity]!;
-      final selectedCityImage = cityImageNames[Random().nextInt(cityImageNames.length)];
-      final imagePath = _buildImagePath(selectedCityImage, weather, latitude: latitude, longitude: longitude);
-      print('✅ [2b] Same country random city: $imagePath');
-      return imagePath;
     }
     
     // 우선순위 3: 지역 폴백 이미지 (같은 나라에 도시 없을 때)
     if (_regionFallback.containsKey(countryCode)) {
-      final regionName = _regionFallback[countryCode]!;
+      String regionName = _regionFallback[countryCode]!;
+      
+      // 중국의 경우 특별 처리
+      if (countryCode == 'CN') {
+        regionName = _getChinaRegionByLocation(cityName, latitude, longitude);
+      }
+      
       final imagePath = _buildRegionalImagePath(regionName, weather);
       print('✅ [3] Region fallback: $imagePath');
       return imagePath;
@@ -429,9 +576,13 @@ class LocationImageService {
       'johannesburg': 'africa',
       'nairobi': 'africa',
       'casablanca': 'africa',
+      'lagos': 'africa',
+      'shanghai': 'asia',
+      'taipei': 'asia',
       
       // 오세아니아
       'sydney': 'oceania',
+      'melbourne': 'oceania',
     };
     
     return cityToRegion[cityName] ?? 'asia'; // 기본값
@@ -471,6 +622,30 @@ class LocationImageService {
 
   static double _toRadians(double degrees) {
     return degrees * pi / 180;
+  }
+
+  /// 중국의 경우 지역별 이미지 결정
+  static String _getChinaRegionByLocation(String cityName, double? latitude, double? longitude) {
+    final cityKey = cityName.toLowerCase().replaceAll(' ', '').replaceAll('-', '_');
+    
+    // 1. 도시명으로 남부 중국 판단
+    if (_southernChinaCities.contains(cityKey)) {
+      print('🇨🇳 Southern China city detected: $cityName');
+      return 'southern_china';
+    }
+    
+    // 2. 위도 기반 판단 (위도 정보가 있는 경우)
+    if (latitude != null) {
+      // 남부 중국: 위도 26도 이남 (광둥, 광시, 하이난, 푸젠 남부, 후난 남부 등)
+      if (latitude < 26.0) {
+        print('🇨🇳 Southern China by latitude: $latitude');
+        return 'southern_china';
+      }
+    }
+    
+    // 3. 기본값: 중국 내륙
+    print('🇨🇳 China inland fallback for: $cityName');
+    return 'china_inland';
   }
 
   /// 가장 가까운 도시 찾기
