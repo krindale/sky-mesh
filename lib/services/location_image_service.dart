@@ -1,5 +1,57 @@
-import 'dart:math';
+/// 위치별 이미지 선택 서비스
+/// 
+/// 이 파일은 사용자의 위치와 날씨 조건에 따라 최적의 배경 이미지를 선택하는 서비스입니다.
+/// 468개의 로우폴리 스타일 이미지를 관리하며, 지능적인 매칭 알고리즘을 사용합니다.
+/// 
+/// ## 이미지 컴렉션 구성
+/// - **68개 주요 도시**: 전 세계 7개 대륙의 대표 도시들
+/// - **6가지 날씨 조건**: cloudy, foggy, rainy, snowy, sunny, sunset
+/// - **10개 지역 대체**: 도시가 없는 지역의 대체 이미지
+/// - **총 468개 이미지**: (68개 도시 × 6개 날씨) + (10개 지역 × 6개 날씨)
+/// 
+/// ## 지원 지역
+/// - **아시아**: 서울, 도쿄, 베이징, 방콕, 싱가포르, 마닐라, 자카르타, 쿠알라룸푸르, 호치민, 방갈로르, 뮄바이, 상하이, 타이베이
+/// - **중동**: 두바이, 테헤란, 리야드, 텔아비브
+/// - **유럽**: 파리, 런던, 베를린, 로마, 암스테르담, 바르셀로나, 프라하, 스톡홀름, 비엔나, 취리히, 모스크바, 이스탄불
+/// - **북미**: 뉴욕, 로스앤젬레스, 샌프란시스코, 시애틀, 시카고, 보스턴, 마이애미, 워싱턴DC, 토론토, 밴쿠버, 멕시코시티
+/// - **남미**: 부에노스아이레스, 리우데자네이루, 산티아고, 상파울루
+/// - **아프리카**: 카이로, 요하네스버그, 나이로비, 카사블랑카, 라고스
+/// - **오세아니아**: 시드니, 멜버른
+/// 
+/// ## 이미지 선택 우선순위
+/// 1. **정확한 도시 매칭**: 도시명이 직접 일치하는 경우
+/// 2. **같은 국가 도시**: 같은 국가 내 지원 도시 중 가장 가까운/랜덤 도시
+/// 3. **지역 대체 이미지**: 지원되는 도시가 없는 국가의 지역별 대체 이미지
+/// 4. **랜덤 대체**: 모든 매칭이 실패한 경우 랜덤 이미지
+/// 
+/// ## 특별 처리 지역
+/// - **중국**: 반남부(위도 26도 이남)와 내륙 지역 분리
+/// - **인도**: 방갈로르/뮄바이 외 도시는 북인도 대체 이미지 사용
+/// - **미국**: 다수의 도시 지원으로 지역별 세분화
+/// 
+/// ## 날씨 조건 매핑
+/// - **sunny**: clear sky, few clouds + 주간 일반 시간
+/// - **cloudy**: scattered/broken/overcast clouds
+/// - **rainy**: rain, shower rain, thunderstorm
+/// - **snowy**: snow
+/// - **foggy**: mist, fog, haze, smoke
+/// - **sunset**: 석양 시간대 (17-19시, 5-7시) 특별 처리
+/// 
+/// @author krindale
+/// @since 1.0.0
 
+import 'dart:math';  // 랜덤 숫자 생성을 위한 수학 라이브러리
+
+/// 위치와 날씨에 따른 이미지 선택 서비스
+/// 
+/// 이 클래스는 468개의 로우폴리 배경 이미지 매핑을 관리하며,
+/// 사용자의 위치와 날씨 조건에 가장 적합한 이미지를 선택합니다.
+/// 
+/// ## 핵심 기능
+/// - **지능적 매칭**: 4단계 우선순위 알고리즘
+/// - **지리적 차이 고려**: 하베르사인 공식으로 거리 계산
+/// - **문화적 적합성**: 지역별 특성을 반영한 이미지 선택
+/// - **성능 최적화**: 정적 매핑 테이블로 빠른 조회
 class LocationImageService {
   // 도시별 이미지 매핑 (우선순위 1)
   static const Map<String, List<String>> _cityImages = {
@@ -405,13 +457,50 @@ class LocationImageService {
     'smoke': 'foggy',
   };
 
-  /// 위치와 날씨에 기반한 이미지 경로 선택
+  /// 위치와 날씨에 기반한 최적 배경 이미지 선택
   /// 
-  /// 우선순위:
-  /// 1. 정확한 도시명 매치
-  /// 2. 같은 나라의 가장 가까운 도시 (위치정보 있을 때) 또는 랜덤 도시
-  /// 3. 지역 폴백 이미지 (같은 나라에 도시 없을 때)
-  /// 4. 랜덤 도시 이미지 (최종 폴백)
+  /// 이 메서드는 SkyMesh 앱의 핵심 기능으로, 4단계 우선순위 알고리즘을 통해
+  /// 사용자의 위치와 날씨 조건에 가장 적합한 468개 이미지 중 하나를 선택합니다.
+  /// 
+  /// @param cityName 도시명 (예: "Seoul", "New York")
+  /// @param countryCode ISO 3166-1 alpha-2 국가코드 (예: "KR", "US")
+  /// @param weatherDescription OpenWeatherMap API의 날씨 설명
+  /// @param latitude 위도 (선택적, 거리 계산용)
+  /// @param longitude 경도 (선택적, 거리 계산용)
+  /// @return String 선택된 이미지의 Flutter Assets 경로
+  /// 
+  /// ## 선택 우선순위
+  /// ### 1단계: 정확한 도시명 매칭
+  /// - 도시명이 68개 지원 도시와 정확히 일치
+  /// - 예: "Seoul" → seoul_sunny.png
+  /// 
+  /// ### 2단계: 같은 국가 내 도시 매칭
+  /// - 2a) GPS 좌표가 있는 경우: 가장 가까운 도시 선택
+  /// - 2b) GPS 좌표가 없는 경우: 국가 내 랜덤 도시 선택
+  /// - 예: 미국 내 지원하지 않는 도시 → 가장 가까운 지원 도시
+  /// 
+  /// ### 3단계: 지역 대체 이미지
+  /// - 국가에 지원 도시가 없는 경우 지역별 대체 이미지 사용
+  /// - 예: 파키스탄 → northern_india_cloudy.png
+  /// 
+  /// ### 4단계: 랜덤 대체
+  /// - 모든 매칭이 실패한 경우 68개 도시 중 랜덤 선택
+  /// 
+  /// ## 특별 처리 지역
+  /// - **중국**: 방남부(위도 26도 이남)와 내륡 지역 구분
+  /// - **인도**: 방갈로르/뮄바이 외는 북인도 대체 이미지
+  /// 
+  /// ## 사용 예시
+  /// ```dart
+  /// final imagePath = LocationImageService.selectBackgroundImage(
+  ///   cityName: "Seoul",
+  ///   countryCode: "KR",
+  ///   weatherDescription: "clear sky",
+  ///   latitude: 37.5665,
+  ///   longitude: 126.9780,
+  /// );
+  /// // 결과: "assets/location_images/regions/asia/seoul_sunny.png"
+  /// ```
   static String selectBackgroundImage({
     required String cityName,
     required String countryCode,
@@ -491,7 +580,28 @@ class LocationImageService {
     return imagePath;
   }
 
-  /// 날씨 상태 매핑
+  /// 날씨 설명을 6가지 이미지 타입으로 매핑
+  /// 
+  /// OpenWeatherMap API의 다양한 날씨 설명을 SkyMesh의 6가지 이미지 타입으로
+  /// 단순화하여 매핑합니다. 시간대를 고려한 석양 처리도 포함합니다.
+  /// 
+  /// @param weatherDescription OpenWeatherMap API의 날씨 설명 문자열
+  /// @return String 매핑된 이미지 타입 (cloudy, foggy, rainy, snowy, sunny, sunset)
+  /// 
+  /// ## 매핑 규칙
+  /// - **sunny**: clear sky, few clouds
+  /// - **cloudy**: scattered clouds, broken clouds, overcast clouds
+  /// - **rainy**: rain, shower rain, thunderstorm
+  /// - **snowy**: snow
+  /// - **foggy**: mist, fog, haze, smoke
+  /// - **sunset**: 석양 시간대 (17-19시, 5-7시) 특별 처리
+  /// 
+  /// ## 시간대 고려사항
+  /// 오후 5-7시와 오전 5-7시에는 날씨와 무관하게 석양 이미지를 우선 선택합니다.
+  /// 이는 현실적인 석양/일출 분위기를 연출하기 위한 디자인 결정입니다.
+  /// 
+  /// ## 기본값
+  /// 어떤 매칭 규칙에도 해당하지 않는 경우 'sunny'를 기본값으로 반환합니다.
   static String _mapWeatherCondition(String weatherDescription) {
     final description = weatherDescription.toLowerCase();
     
@@ -510,13 +620,50 @@ class LocationImageService {
     return 'sunny'; // 기본값
   }
 
-  /// 도시 이미지 경로 생성 (지역별 폴더 구조)
+  /// 도시별 이미지 경로 생성
+  /// 
+  /// 도시명과 날씨 조건을 기반으로 Flutter Assets 경로를 생성합니다.
+  /// 도시는 7개 지역 폴더로 분류되어 있어 지역을 먼저 확인한 후 경로를 생성합니다.
+  /// 
+  /// @param cityName 도시명 (예: "seoul", "tokyo")
+  /// @param weather 날씨 타입 (예: "sunny", "rainy")
+  /// @param latitude 위도 (선택적, 향후 확장을 위해 보존)
+  /// @param longitude 경도 (선택적, 향후 확장을 위해 보존)
+  /// @return String Flutter Assets 경로
+  /// 
+  /// ## 경로 구조
+  /// ```
+  /// assets/location_images/regions/{region}/{city}_{weather}.png
+  /// ```
+  /// 
+  /// ## 예시
+  /// - seoul + sunny → "assets/location_images/regions/asia/seoul_sunny.png"
+  /// - paris + rainy → "assets/location_images/regions/europe/paris_rainy.png"
+  /// - sydney + cloudy → "assets/location_images/regions/oceania/sydney_cloudy.png"
   static String _buildImagePath(String cityName, String weather, {double? latitude, double? longitude}) {
     final region = _getCityRegion(cityName);
     return 'assets/location_images/regions/$region/${cityName}_${weather}.png';
   }
 
-  /// 도시가 속한 지역 반환
+  /// 도시가 속한 지역 폴더명 반환
+  /// 
+  /// 68개 지원 도시를 7개 지역 폴더로 분류하여 해당 도시가 속한
+  /// 지역명을 반환합니다. 이는 이미지 파일 경로 생성에 사용됩니다.
+  /// 
+  /// @param cityName 도시명 (예: "seoul", "paris")
+  /// @return String 지역 폴더명
+  /// 
+  /// ## 지역 분류
+  /// - **asia**: 아시아 13개 도시
+  /// - **middle_east**: 중동 4개 도시  
+  /// - **europe**: 유럽 12개 도시
+  /// - **north_america**: 북미 11개 도시
+  /// - **south_america**: 남미 4개 도시
+  /// - **africa**: 아프리카 5개 도시
+  /// - **oceania**: 오세아니아 2개 도시
+  /// 
+  /// ## 기본값
+  /// 매핑되지 않는 도시는 'asia'를 기본값으로 반환합니다.
   static String _getCityRegion(String cityName) {
     const Map<String, String> cityToRegion = {
       // 아시아
@@ -588,17 +735,82 @@ class LocationImageService {
     return cityToRegion[cityName] ?? 'asia'; // 기본값
   }
 
-  /// 지역 폴백 이미지 경로 생성
+  /// 지역 대체 이미지 경로 생성
+  /// 
+  /// 지원되는 도시가 없는 국가나 지역의 경우 사용하는 대체 이미지 경로를 생성합니다.
+  /// 10개 지역의 대체 이미지로 전 세계 대부분의 지역을 커버합니다.
+  /// 
+  /// @param regionName 지역 대체 이미지명
+  /// @param weather 날씨 타입
+  /// @return String Flutter Assets 경로
+  /// 
+  /// ## 경로 구조
+  /// ```
+  /// assets/location_images/regional_fallback/{region}/{region}_{weather}.png
+  /// ```
+  /// 
+  /// ## 지원 대체 지역
+  /// - **central_asia**: 중앙아시아 (카자흐스탄, 우즈베키스탄 등)
+  /// - **china_inland**: 중국 내륙 지역
+  /// - **southern_china**: 중국 남부 지역
+  /// - **northern_india**: 북인도 지역
+  /// - **southeast_asia_extended**: 확장 동남아시아
+  /// - **eastern_europe**: 동유럽
+  /// - **northern_andes**: 북안데스 지역
+  /// - **east_africa**: 동아프리카
+  /// - **west_africa**: 서아프리카
+  /// - **oceania_extended**: 확장 오세아니아
   static String _buildRegionalImagePath(String regionName, String weather) {
     return 'assets/location_images/regional_fallback/${regionName}/${regionName}_${weather}.png';
   }
 
-  /// 사용 가능한 모든 도시 목록 반환
+  /// SkyMesh에서 지원하는 모든 도시 목록 반환
+  /// 
+  /// 68개 주요 도시의 목록을 반환합니다. 이 도시들은 각각 6가지 날씨 조건의
+  /// 로우폴리 이미지를 보유하고 있습니다.
+  /// 
+  /// @return List<String> 지원 도시 목록
+  /// 
+  /// ## 사용 예시
+  /// ```dart
+  /// final cities = LocationImageService.getAllSupportedCities();
+  /// print('지원 도시 수: ${cities.length}'); // 68
+  /// print('첫 번째 도시: ${cities.first}');
+  /// ```
+  /// 
+  /// ## 활용 방안
+  /// - 랜덤 도시 선택을 위한 풀 제공
+  /// - UI에서 도시 리스트 표시
+  /// - 디버그 및 테스트 용도
   static List<String> getAllSupportedCities() {
     return _cityImages.keys.toList();
   }
 
-  /// 특정 국가의 지원 도시 목록 반환
+  /// 특정 국가에서 지원하는 도시 목록 반환
+  /// 
+  /// ISO 3166-1 alpha-2 국가코드를 바탕으로 해당 국가에서 직접 지원하는
+  /// 도시들의 목록을 반환합니다.
+  /// 
+  /// @param countryCode ISO 3166-1 alpha-2 국가코드 (예: "KR", "US", "JP")
+  /// @return List<String> 해당 국가의 지원 도시 목록 (빈 리스트 가능)
+  /// 
+  /// ## 사용 예시
+  /// ```dart
+  /// final koreanCities = LocationImageService.getCitiesForCountry('KR');
+  /// print(koreanCities); // ['seoul']
+  /// 
+  /// final usCities = LocationImageService.getCitiesForCountry('US');
+  /// print(usCities.length); // 8 (뉴욕, LA, 샌프란시스코 등)
+  /// 
+  /// final unknownCities = LocationImageService.getCitiesForCountry('XX');
+  /// print(unknownCities); // [] (빈 리스트)
+  /// ```
+  /// 
+  /// ## 주요 국가별 도시 수
+  /// - 미국 (US): 8개 도시
+  /// - 중국 (CN): 2개 도시 (베이징, 상하이)
+  /// - 인도 (IN): 2개 도시 (방갈로르, 뮄바이)
+  /// - 기타 대부분 국가: 1개 도시
   static List<String> getCitiesForCountry(String countryCode) {
     return _countryToCities[countryCode] ?? [];
   }

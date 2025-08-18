@@ -1,61 +1,320 @@
-/// Low Poly Spacing System
-/// Geometric spacing system based on 8px grid
-/// with additional faceted ratios for angular layouts
+/// SkyMesh 로우폴리 간격 시스템
+/// 
+/// 이 파일은 SkyMesh 앱의 모든 간격과 크기를 일관되게 관리하는 시스템입니다.
+/// 8px 그리드 시스템을 기반으로 하며, 로우폴리 아트의 기하학적 특성을 반영한
+/// 특별한 비율과 각진 레이아웃을 위한 추가적인 간격 값들을 제공합니다.
+/// 
+/// ## 디자인 원칙
+/// 
+/// ### 1. 수학적 일관성 (Mathematical Consistency)
+/// - 8px 기본 단위를 사용하여 모든 간격이 8의 배수로 구성
+/// - 디바이스 픽셀 밀도와 관계없이 일관된 시각적 리듬 제공
+/// - 접근성을 고려한 최소 터치 영역(44px) 보장
+/// 
+/// ### 2. 기하학적 비율 (Geometric Ratios)
+/// - √2, √3, 황금비(φ) 등 자연스러운 수학적 비율 활용
+/// - 로우폴리 아트의 면 분할과 조화를 이루는 특별한 간격
+/// - 각진 형태와 대각선 요소를 위한 특화된 spacing 값
+/// 
+/// ### 3. 컴포넌트 특화 (Component-Specific Design)
+/// - 날씨 카드, 위치 정보 등 앱 특성에 맞는 전용 간격
+/// - 각 UI 컴포넌트의 기능과 중요도에 따른 차별화된 간격
+/// - 일관된 사용자 경험을 위한 표준화된 패딩과 마진
+/// 
+/// ## 간격 체계
+/// 
+/// ### 기본 간격 스케일 (8px 배수)
+/// - **xs**: 4px - 최소 간격, 미세한 구분
+/// - **sm**: 8px - 작은 간격, 인접 요소 분리
+/// - **md**: 16px - 중간 간격, 표준 패딩
+/// - **lg**: 24px - 큰 간격, 섹션 구분
+/// - **xl**: 32px - 매우 큰 간격, 주요 영역 분리
+/// - **xxl**: 48px - 극대 간격, 페이지 레벨 구분
+/// - **xxxl**: 64px - 최대 간격, 화면 전체 구조
+/// 
+/// ### 보조 간격 스케일 (0.5px 단위 추가)
+/// - 더 세밀한 조정이 필요한 경우 사용
+/// - 타이포그래피와 아이콘의 정밀한 정렬
+/// 
+/// ### 기하학적 특수 간격
+/// - **facet1**: √2 비율 (≈11.3px) - 45도 대각선 요소
+/// - **facet2**: √3 비율 (≈13.9px) - 60도 각도 요소
+/// - **facet3**: 황금비 φ (≈17.9px) - 자연스러운 비례
+/// 
+/// ## 사용 예시
+/// 
+/// ```dart
+/// // 기본 간격 사용
+/// Padding(
+///   padding: EdgeInsets.all(LowPolySpacing.md), // 16px
+///   child: Text('Hello World'),
+/// )
+/// 
+/// // 컴포넌트별 특화 간격
+/// Container(
+///   padding: EdgeInsets.all(LowPolySpacing.weatherCardPadding), // 24px
+///   margin: EdgeInsets.symmetric(vertical: LowPolySpacing.weatherCardSpacing), // 16px
+/// )
+/// 
+/// // 기하학적 특수 간격
+/// Transform.translate(
+///   offset: Offset(LowPolySpacing.facet1, LowPolySpacing.facet2),
+///   child: Icon(Icons.navigation),
+/// )
+/// ```
+/// 
+/// @author krindale
+/// @since 1.0.0
+
+/// 로우폴리 디자인 시스템 간격 클래스
+/// 
+/// SkyMesh 앱의 모든 간격, 패딩, 마진, 크기를 중앙 관리하는 정적 클래스입니다.
+/// 8px 그리드 시스템을 기반으로 하며, 로우폴리 아트의 기하학적 특성을 반영한
+/// 특별한 비율들도 포함합니다.
+/// 
+/// ## 네이밍 규칙
+/// - **크기별 접미사**: xs, sm, md, lg, xl, xxl, xxxl (Extra Small → Extra Extra Extra Large)
+/// - **용도별 접두사**: card, list, button, icon, section, page 등
+/// - **기하학적 이름**: facet1, facet2, facet3 (수학적 비율 기반)
 class LowPolySpacing {
-  // Base unit (8px) - follows Material Design guidelines
+  // ====================================================================
+  // 기본 단위 (Base Unit) - Material Design 가이드라인 준수
+  // ====================================================================
+  
+  /// 기본 단위 - 8px
+  /// Material Design과 iOS HIG에서 권장하는 표준 그리드 단위
+  /// 모든 간격 계산의 기준이 되는 핵심 값
   static const double base = 8.0;
   
-  // Primary spacing scale (8px increments)
-  static const double xs = base * 0.5;    // 4px
-  static const double sm = base * 1;      // 8px
-  static const double md = base * 2;      // 16px
-  static const double lg = base * 3;      // 24px
-  static const double xl = base * 4;      // 32px
-  static const double xxl = base * 6;     // 48px
-  static const double xxxl = base * 8;    // 64px
+  // ====================================================================
+  // 주요 간격 스케일 (Primary Spacing Scale) - 8px 배수 기준
+  // 가장 자주 사용되는 표준 간격 값들
+  // ====================================================================
   
-  // Secondary spacing scale (for fine-tuning)
-  static const double xs2 = base * 0.75;  // 6px
-  static const double sm2 = base * 1.5;   // 12px
-  static const double md2 = base * 2.5;   // 20px
-  static const double lg2 = base * 3.5;   // 28px
-  static const double xl2 = base * 5;     // 40px
-  static const double xxl2 = base * 7;    // 56px
+  /// 최소 간격 - 4px (base * 0.5)
+  /// 사용처: 미세한 구분선, 인접한 아이콘들 사이, 밀착된 요소들
+  /// 예시: 아이콘과 텍스트 사이, 칩 내부 패딩, 구분선 두께
+  static const double xs = base * 0.5;
   
-  // Special low poly ratios (for angular layouts)
-  static const double facet1 = base * 1.414;  // √2 ratio ≈ 11.3px
-  static const double facet2 = base * 1.732;  // √3 ratio ≈ 13.9px
-  static const double facet3 = base * 2.236;  // Golden ratio φ ≈ 17.9px
+  /// 작은 간격 - 8px (base * 1)
+  /// 사용처: 작은 패딩, 인접 요소 분리, 미니멀한 여백
+  /// 예시: 버튼 내부 패딩, 리스트 아이템 간격, 작은 카드 패딩
+  static const double sm = base * 1;
   
-  // Component-specific spacing
-  static const double cardPadding = md;        // 16px
-  static const double listItemPadding = md;    // 16px
-  static const double buttonPadding = sm2;     // 12px
-  static const double iconPadding = sm;        // 8px
-  static const double sectionSpacing = xl;     // 32px
-  static const double pageMargin = md;         // 16px
+  /// 중간 간격 - 16px (base * 2)
+  /// 사용처: 표준 패딩, 일반적인 마진, 기본 여백
+  /// 예시: 카드 내부 패딩, 페이지 마진, 일반적인 컴포넌트 간격
+  static const double md = base * 2;
   
-  // Weather card specific
-  static const double weatherCardPadding = lg;     // 24px
-  static const double weatherCardSpacing = md;     // 16px
-  static const double weatherIconSize = xl;        // 32px
+  /// 큰 간격 - 24px (base * 3)
+  /// 사용처: 섹션 구분, 그룹 분리, 강조된 여백
+  /// 예시: 날씨 카드 패딩, 헤더 아래 여백, 중요한 구성 요소 분리
+  static const double lg = base * 3;
   
-  // Location/timezone specific
-  static const double locationCardPadding = lg;    // 24px
-  static const double timezoneSpacing = xxl;       // 48px
-  static const double cityImageHeight = xxxl * 3;  // 192px
+  /// 매우 큰 간격 - 32px (base * 4)
+  /// 사용처: 주요 영역 분리, 페이지 레벨 구분, 강한 시각적 분리
+  /// 예시: 메인 섹션 간격, 대형 컴포넌트 마진, 헤더/푸터와 본문 사이
+  static const double xl = base * 4;
   
-  // Border radius (angular/faceted design)
+  /// 극대 간격 - 48px (base * 6)
+  /// 사용처: 페이지 레벨 구분, 화면 상단/하단 여백, 주요 레이아웃 분리
+  /// 예시: 페이지 상단 여백, 큰 섹션 사이 간격, 스크롤 영역 패딩
+  static const double xxl = base * 6;
+  
+  /// 최대 간격 - 64px (base * 8)
+  /// 사용처: 화면 전체 구조, 최대 레벨 분리, 스플래시/온보딩 레이아웃
+  /// 예시: 온보딩 화면 여백, 스플래시 화면 패딩, 전체 페이지 구조
+  static const double xxxl = base * 8;
+  
+  // ====================================================================
+  // 보조 간격 스케일 (Secondary Spacing Scale) - 세밀한 조정용
+  // 0.5 단위 추가로 더 정밀한 간격 조정이 필요한 경우 사용
+  // ====================================================================
+  
+  /// 보조 최소 간격 - 6px (base * 0.75)
+  /// 사용처: xs와 sm 사이의 중간값, 타이포그래피 미세 조정
+  static const double xs2 = base * 0.75;
+  
+  /// 보조 작은 간격 - 12px (base * 1.5)
+  /// 사용처: sm과 md 사이의 중간값, 버튼 패딩, 적당한 여백
+  static const double sm2 = base * 1.5;
+  
+  /// 보조 중간 간격 - 20px (base * 2.5)
+  /// 사용처: md와 lg 사이의 중간값, 폼 요소 간격, 리스트 패딩
+  static const double md2 = base * 2.5;
+  
+  /// 보조 큰 간격 - 28px (base * 3.5)
+  /// 사용처: lg와 xl 사이의 중간값, 섹션 제목 아래 여백
+  static const double lg2 = base * 3.5;
+  
+  /// 보조 매우 큰 간격 - 40px (base * 5)
+  /// 사용처: xl과 xxl 사이의 중간값, 대형 카드 패딩
+  static const double xl2 = base * 5;
+  
+  /// 보조 극대 간격 - 56px (base * 7)
+  /// 사용처: xxl과 xxxl 사이의 중간값, 페이지 레벨 여백
+  static const double xxl2 = base * 7;
+  
+  // ====================================================================
+  // 기하학적 특수 간격 (Geometric Special Ratios) - 로우폴리 특화
+  // 수학적 비율을 활용한 자연스럽고 조화로운 간격 값들
+  // ====================================================================
+  
+  /// 면 분할 비율 1 - √2 비율 ≈ 11.3px (base * 1.414)
+  /// 사용처: 45도 대각선 요소, 정사각형의 대각선 비율, 회전된 요소
+  /// 수학적 의미: 정사각형의 한 변과 대각선의 비율
+  /// 예시: 대각선 그림자, 45도 회전 아이콘, 다이아몬드 형태 요소
+  static const double facet1 = base * 1.414;
+  
+  /// 면 분할 비율 2 - √3 비율 ≈ 13.9px (base * 1.732)
+  /// 사용처: 60도 각도 요소, 정삼각형 비율, 육각형 요소
+  /// 수학적 의미: 정삼각형의 높이와 밑변의 비율
+  /// 예시: 육각형 버튼, 60도 기울어진 요소, 삼각형 아이콘
+  static const double facet2 = base * 1.732;
+  
+  /// 면 분할 비율 3 - 황금비 φ ≈ 17.9px (base * 2.236)
+  /// 사용처: 자연스러운 비례, 심미적 균형, 황금 분할 레이아웃
+  /// 수학적 의미: 가장 아름다운 비율로 인식되는 황금비 (1.618...)
+  /// 예시: 카드 비율, 이미지 크롭, 균형잡힌 레이아웃 요소
+  static const double facet3 = base * 2.236;
+  
+  // ====================================================================
+  // 컴포넌트별 특화 간격 (Component-Specific Spacing) - 일반 UI 요소
+  // 자주 사용되는 UI 컴포넌트들의 표준화된 간격 값들
+  // ====================================================================
+  
+  /// 카드 패딩 - 16px (md)
+  /// 사용처: 일반적인 카드 내부 패딩, 콘텐츠와 경계 사이 여백
+  /// 적용 대상: 정보 카드, 리스트 카드, 미디어 카드
+  static const double cardPadding = md;
+  
+  /// 리스트 아이템 패딩 - 16px (md)
+  /// 사용처: 리스트뷰 아이템 내부 패딩, 메뉴 아이템 패딩
+  /// 적용 대상: 설정 메뉴, 네비게이션 메뉴, 선택 리스트
+  static const double listItemPadding = md;
+  
+  /// 버튼 패딩 - 12px (sm2)
+  /// 사용처: 버튼 내부 텍스트와 경계 사이 패딩
+  /// 적용 대상: 일반 버튼, 플로팅 액션 버튼, 칩 버튼
+  /// 참고: 최소 터치 영역 44px 확보를 위한 적절한 크기
+  static const double buttonPadding = sm2;
+  
+  /// 아이콘 패딩 - 8px (sm)
+  /// 사용처: 아이콘 주변 터치 영역, 아이콘과 다른 요소 사이 간격
+  /// 적용 대상: 네비게이션 아이콘, 액션 아이콘, 상태 아이콘
+  static const double iconPadding = sm;
+  
+  /// 섹션 간격 - 32px (xl)
+  /// 사용처: 페이지 내 주요 섹션들 사이의 구분 간격
+  /// 적용 대상: 헤더와 본문, 다른 기능 영역들 사이
+  static const double sectionSpacing = xl;
+  
+  /// 페이지 마진 - 16px (md)
+  /// 사용처: 페이지 전체 좌우 마진, 안전 영역 확보
+  /// 적용 대상: 전체 페이지 레이아웃, 스크린 경계와 콘텐츠 사이
+  static const double pageMargin = md;
+  
+  // ====================================================================
+  // 날씨 카드 전용 간격 (Weather Card Specific) - SkyMesh 앱 특화
+  // 날씨 정보 표시에 최적화된 간격 값들
+  // ====================================================================
+  
+  /// 날씨 카드 패딩 - 24px (lg)
+  /// 사용처: 날씨 카드 내부 패딩, 날씨 정보와 카드 경계 사이
+  /// 특징: 일반 카드보다 더 넉넉한 패딩으로 시각적 여유 제공
+  /// 적용 대상: 현재 날씨 카드, 예보 카드, 상세 정보 카드
+  static const double weatherCardPadding = lg;
+  
+  /// 날씨 카드 간격 - 16px (md)
+  /// 사용처: 여러 날씨 카드들 사이의 간격, 리스트 형태 배열
+  /// 적용 대상: 시간별 예보 카드들, 일별 예보 카드들
+  static const double weatherCardSpacing = md;
+  
+  /// 날씨 아이콘 크기 - 32px (xl)
+  /// 사용처: 날씨 상태를 나타내는 아이콘의 표준 크기
+  /// 특징: 충분한 시인성과 터치 영역을 확보하는 적절한 크기
+  /// 적용 대상: 현재 날씨 아이콘, 예보 아이콘, 상태 표시 아이콘
+  static const double weatherIconSize = xl;
+  
+  // ====================================================================
+  // 위치/시간대 전용 간격 (Location/Timezone Specific) - 지리적 정보 특화
+  // 위치 정보와 시간대 표시에 최적화된 간격 값들
+  // ====================================================================
+  
+  /// 위치 카드 패딩 - 24px (lg)
+  /// 사용처: 위치 정보 카드 내부 패딩, 도시명과 카드 경계 사이
+  /// 적용 대상: 도시 선택 카드, 위치 검색 결과, 즐겨찾기 위치
+  static const double locationCardPadding = lg;
+  
+  /// 시간대 간격 - 48px (xxl)
+  /// 사용처: 다른 시간대 정보들 사이의 구분 간격
+  /// 특징: 시간대별로 명확한 시각적 구분을 위한 넉넉한 간격
+  /// 적용 대상: 세계 시계, 시간대별 날씨, 다국가 정보
+  static const double timezoneSpacing = xxl;
+  
+  /// 도시 이미지 높이 - 192px (xxxl * 3)
+  /// 사용처: 468개 로우폴리 도시 이미지의 표준 표시 높이
+  /// 특징: 로우폴리 이미지의 디테일을 충분히 보여주는 적절한 크기
+  /// 적용 대상: 배경 이미지, 도시 미리보기, 위치 선택 화면
+  static const double cityImageHeight = xxxl * 3;
+  
+  // ====================================================================
+  // 모서리 둥글기 (Border Radius) - 각진/면 분할 디자인
+  // 로우폴리 아트의 기하학적 특성을 반영한 최소한의 둥글기
+  // ====================================================================
+  
+  /// 둥글기 없음 - 0px
+  /// 사용처: 완전히 각진 요소, 로우폴리 스타일 강조
+  /// 적용 대상: 기하학적 강조가 필요한 요소, 각진 카드
   static const double radiusNone = 0.0;
-  static const double radiusXs = xs / 2;      // 2px
-  static const double radiusSm = xs;          // 4px
-  static const double radiusMd = sm;          // 8px
-  static const double radiusLg = sm2;         // 12px
-  static const double radiusXl = md;          // 16px
-  static const double radiusXxl = lg;         // 24px
   
-  // Angular cuts (for low poly effect)
-  static const double cutSmall = sm;          // 8px
-  static const double cutMedium = md;         // 16px
-  static const double cutLarge = lg;          // 24px
+  /// 최소 둥글기 - 2px (xs / 2)
+  /// 사용처: 미세한 모서리 부드러움, 거의 각진 형태
+  /// 적용 대상: 입력 필드, 작은 버튼, 칩
+  static const double radiusXs = xs / 2;
+  
+  /// 작은 둥글기 - 4px (xs)
+  /// 사용처: 약간의 부드러움이 필요한 작은 요소
+  /// 적용 대상: 작은 카드, 아이콘 배경, 상태 표시
+  static const double radiusSm = xs;
+  
+  /// 중간 둥글기 - 8px (sm)
+  /// 사용처: 표준적인 모서리 둥글기, 일반적인 UI 요소
+  /// 적용 대상: 일반 버튼, 기본 카드, 입력 컨테이너
+  static const double radiusMd = sm;
+  
+  /// 큰 둥글기 - 12px (sm2)
+  /// 사용처: 부드러운 느낌이 필요한 주요 요소
+  /// 적용 대상: 주요 카드, 모달 다이얼로그, 중요한 버튼
+  static const double radiusLg = sm2;
+  
+  /// 매우 큰 둥글기 - 16px (md)
+  /// 사용처: 강조된 부드러움, 친근한 느낌의 큰 요소
+  /// 적용 대상: 대형 카드, 이미지 컨테이너, 특별한 영역
+  static const double radiusXl = md;
+  
+  /// 극대 둥글기 - 24px (lg)
+  /// 사용처: 매우 부드러운 곡선, 브랜딩 요소
+  /// 적용 대상: 히어로 카드, 브랜딩 컨테이너, 특별한 강조 영역
+  static const double radiusXxl = lg;
+  
+  // ====================================================================
+  // 각진 절단 (Angular Cuts) - 로우폴리 효과 전용
+  // 면 분할과 기하학적 절단 효과를 위한 특별한 값들
+  // ====================================================================
+  
+  /// 작은 절단 - 8px (sm)
+  /// 사용처: 미묘한 각진 효과, 작은 면 분할
+  /// 적용 대상: 작은 카드의 모서리 절단, 미니멀한 기하학적 효과
+  static const double cutSmall = sm;
+  
+  /// 중간 절단 - 16px (md)
+  /// 사용처: 명확한 각진 효과, 중간 크기 면 분할
+  /// 적용 대상: 일반 카드의 모서리 절단, 로우폴리 스타일 강조
+  static const double cutMedium = md;
+  
+  /// 큰 절단 - 24px (lg)
+  /// 사용처: 강한 각진 효과, 대형 면 분할
+  /// 적용 대상: 대형 카드나 이미지의 드라마틱한 절단 효과
+  static const double cutLarge = lg;
 }
