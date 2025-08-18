@@ -8,8 +8,45 @@ import '../../core/models/hourly_weather_data.dart';
 import '../../core/models/weekly_weather_data.dart';
 
 /// Concrete implementation of WeatherRepository using OpenWeatherMap API
-/// Follows SRP - only responsible for weather data operations
-/// Follows OCP - can be extended with different strategies without modification
+/// 
+/// This service provides weather data by communicating with the OpenWeatherMap API.
+/// It implements the Repository pattern to abstract data source details from
+/// the business logic layer.
+/// 
+/// ## SOLID Principles Adherence
+/// - **SRP**: Only responsible for weather data operations via OpenWeatherMap API
+/// - **OCP**: Can be extended with different strategies without modification
+/// - **LSP**: Fully substitutable for WeatherRepository interface
+/// - **DIP**: Depends on abstractions (LocationService, WeatherDataFactory)
+/// 
+/// ## Features
+/// - Current weather by location or coordinates
+/// - Hourly and weekly forecasts
+/// - Random city weather exploration
+/// - Automatic fallback to mock data on network failures
+/// - Error handling with graceful degradation
+/// 
+/// ## Usage
+/// 
+/// ```dart
+/// final service = OpenWeatherApiService(
+///   locationService: GeolocatorService(),
+/// );
+/// 
+/// // Get current weather
+/// final weather = await service.getCurrentWeather();
+/// 
+/// // Get weather for specific coordinates
+/// final weatherAt = await service.getWeatherByCoordinates(37.7749, -122.4194);
+/// 
+/// // Explore random city
+/// final randomWeather = await service.getRandomCityWeather();
+/// ```
+/// 
+/// ## Error Handling
+/// 
+/// All methods gracefully handle network errors, API failures, and permission
+/// issues by falling back to mock data to ensure the app remains functional.
 class OpenWeatherApiService implements WeatherRepository {
   static const String _apiKey = 'a179131038d53e44738851b4938c5cd0';
   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
@@ -18,6 +55,10 @@ class OpenWeatherApiService implements WeatherRepository {
   final LocationService _locationService;
   final WeatherDataFactory _weatherDataFactory;
 
+  /// Creates an OpenWeatherApiService instance
+  /// 
+  /// [locationService] is required for GPS-based weather requests
+  /// [weatherDataFactory] is optional and defaults to WeatherDataFactory
   OpenWeatherApiService({
     required LocationService locationService,
     WeatherDataFactory? weatherDataFactory,
@@ -139,7 +180,27 @@ class OpenWeatherApiService implements WeatherRepository {
   }
 }
 
-/// Factory class for creating weather data (SRP - only creates weather objects)
+/// Factory class for creating weather data following SRP
+/// 
+/// This factory is responsible only for creating weather objects, both from
+/// real data and mock data for testing or fallback scenarios.
+/// 
+/// ## Responsibilities
+/// - Create mock weather data for error fallback scenarios
+/// - Generate random weather data for testing
+/// - Create hourly and weekly forecast mock data
+/// 
+/// ## Usage
+/// 
+/// ```dart
+/// final factory = WeatherDataFactory();
+/// 
+/// // Create mock data for fallback
+/// final mockWeather = factory.createMockWeatherData();
+/// 
+/// // Create random mock data for testing
+/// final randomWeather = factory.createRandomMockWeatherData();
+/// ```
 class WeatherDataFactory {
   WeatherData createMockWeatherData() {
     return WeatherData(
@@ -270,7 +331,28 @@ class WeatherDataFactory {
   }
 }
 
-/// Provider for random city data (SRP - only provides city data)
+/// Provider for random city data following SRP
+/// 
+/// This class is responsible only for providing city data for the random
+/// weather exploration feature. It maintains a curated list of 68 major
+/// cities worldwide with their coordinates.
+/// 
+/// ## Features
+/// - 68 major cities across all continents
+/// - Accurate latitude/longitude coordinates
+/// - Random city selection for weather exploration
+/// - Immutable city data access
+/// 
+/// ## Usage
+/// 
+/// ```dart
+/// // Get a random city
+/// final city = RandomCityProvider.getRandomCity();
+/// print('${city['name']}, ${city['country']}'); // "Tokyo, JP"
+/// 
+/// // Get all available cities
+/// final allCities = RandomCityProvider.getAllCities();
+/// ```
 class RandomCityProvider {
   static const List<Map<String, dynamic>> _cities = [
     {'latitude': 37.5665, 'longitude': 126.9780, 'name': 'Seoul', 'country': 'KR'},
