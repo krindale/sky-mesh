@@ -43,6 +43,7 @@ import 'package:flutter/services.dart';       // 햅틱 피드백 서비스
 import '../core/models/weather_data.dart';           // 현재 날씨 데이터 모델
 import '../core/models/hourly_weather_data.dart';    // 시간별 날씨 예보 모델
 import '../core/models/weekly_weather_data.dart';    // 주간 날씨 예보 모델
+import 'weather_news_sheet.dart';                    // 날씨 뉴스 하단 시트
 
 /// 날씨 정보를 표시하는 메인 위젯
 /// 
@@ -386,14 +387,14 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
                     ],
                   ),
                   
-                  // === 새로고침 버튼 (플로팅) ===
+                  // === 액션 버튼들 (플로팅) ===
                   
-                  /// 우상단에 고정된 새로고침 버튼
-                  /// 다른 UI 요소 위에 떠있는 형태로 배치
+                  /// 우상단에 고정된 액션 버튼들
+                  /// 새로고침 버튼과 뉴스 버튼을 포함
                   Positioned(
                     top: 16,     // 상단에서 16px
                     right: 16,   // 우측에서 16px
-                    child: _buildRefreshButton(context),
+                    child: _buildActionButtons(context),
                   ),
                 ],
               ),
@@ -929,45 +930,53 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
     );
   }
 
-  /// 새로고침 버튼 UI 구성 메서드
+  /// 액션 버튼들을 구성합니다 (새로고침 + 뉴스)
   /// 
-  /// 우상단에 고정된 원형 새로고침 버튼을 구성합니다.
-  /// 했틱 피드백과 함께 사용자 친화적인 인터랙션을 제공합니다.
+  /// 우상단에 고정된 원형 액션 버튼들을 수직으로 배치합니다.
+  /// 햡틱 피드백과 함께 사용자 친화적인 인터랙션을 제공합니다.
   /// 
   /// @param context BuildContext for accessing theme and media queries
-  /// @return Widget 새로고침 버튼 UI
+  /// @return Widget 액션 버튼들 UI
+  Widget _buildActionButtons(BuildContext context) {
+    return Column(
+      children: [
+        // 뉴스 버튼
+        _buildNewsButton(context),
+        
+        const SizedBox(height: 12),
+        
+        // 새로고침 버튼
+        _buildRefreshButton(context),
+      ],
+    );
+  }
+
+  /// 뉴스 버튼 UI 구성 메서드
   /// 
-  /// ## UI 특징
-  /// - **원형 디자인**: 44x44px의 원형 버튼
-  /// - **대화형 버튼**: 쉽게 터치할 수 있는 크기
-  /// - **Glassmorphism**: 반투명 배경으로 현대적 느낌
-  /// - **미세한 테두리**: 연한 테두리로 세련된 느낌
+  /// 날씨 뉴스 하단 시트를 열기 위한 원형 뉴스 버튼을 구성합니다.
   /// 
-  /// ## 인터랙션 효과
-  /// - **햄틱 피드백**: 버튼 터치 시 가벼운 진동
-  /// - **즐각적 반응**: 사용자 액션에 대한 즉각적 피드백
-  /// 
-  /// ## 접근성
-  /// - 충분한 터치 영역 (44x44px)
-  /// - 명확한 아이콘으로 기능 인식 용이
-  /// - 고대비 아이콘으로 시인성 확보
-  Widget _buildRefreshButton(BuildContext context) {
+  /// @param context BuildContext for accessing theme and media queries
+  /// @return Widget 뉴스 버튼 UI
+  Widget _buildNewsButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        /// 햄틱 피드백 제공
-        /// 가벼운 진동으로 버튼 터치를 사용자에게 알림
-        /// iOS와 Android 모두에서 지원되는 표준 피드백
+        /// 햅틱 피드백 제공
         HapticFeedback.lightImpact();
         
-        /// 부모에서 전달받은 새로고침 콜백 함수 호출
-        /// 날씨 데이터 재로딩을 트리거함
-        widget.onRefresh();
+        /// 날씨 뉴스 하단 시트 열기
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          barrierColor: Colors.black54,
+          builder: (context) => WeatherNewsSheet(
+            weatherData: widget.weatherData,
+          ),
+        );
       },
       
       child: Container(
         /// 대화형 버튼 크기 (44x44px)
-        /// Apple Human Interface Guidelines 및 Material Design 권장사항에 따라
-        /// 쉽게 터치할 수 있는 최소 크기
         width: 44,
         height: 44,
         
@@ -976,13 +985,59 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
           /// 반투명 검은 배경으로 유리 같은 효과
           color: Colors.black.withOpacity(0.3),
           
-          /// 원형 모양으로 정다운 느낌
+          /// 원형 모양
           shape: BoxShape.circle,
           
-          /// 미세한 테두리로 세련된 느낌 연출
+          /// 미세한 테두리
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),   // 연한 테두리
-            width: 1,                               // 엷은 두께
+            color: Colors.white.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        
+        /// 뉴스 아이콘
+        child: Icon(
+          Icons.article_outlined,                  // Material Design 뉴스 아이콘
+          color: Colors.white.withOpacity(0.8),    // 고대비를 위한 흰색
+          size: 22,                                // 버튼 크기에 적합한 아이콘 크기
+        ),
+      ),
+    );
+  }
+
+  /// 새로고침 버튼 UI 구성 메서드
+  /// 
+  /// 원형 새로고침 버튼을 구성합니다.
+  /// 
+  /// @param context BuildContext for accessing theme and media queries
+  /// @return Widget 새로고침 버튼 UI
+  Widget _buildRefreshButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        /// 햅틱 피드백 제공
+        HapticFeedback.lightImpact();
+        
+        /// 부모에서 전달받은 새로고침 콜백 함수 호출
+        widget.onRefresh();
+      },
+      
+      child: Container(
+        /// 대화형 버튼 크기 (44x44px)
+        width: 44,
+        height: 44,
+        
+        /// Glassmorphism 스타일의 원형 버튼 디자인
+        decoration: BoxDecoration(
+          /// 반투명 검은 배경으로 유리 같은 효과
+          color: Colors.black.withOpacity(0.3),
+          
+          /// 원형 모양
+          shape: BoxShape.circle,
+          
+          /// 미세한 테두리
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+            width: 1,
           ),
         ),
         

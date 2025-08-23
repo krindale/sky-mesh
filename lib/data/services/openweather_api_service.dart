@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import '../../core/interfaces/weather_repository.dart';
+import '../../core/interfaces/weather_interfaces.dart';
 import '../../core/interfaces/location_service.dart';
 import '../../core/models/weather_data.dart';
 import '../../core/models/hourly_weather_data.dart';
@@ -47,7 +48,7 @@ import '../../core/models/weekly_weather_data.dart';
 /// 
 /// All methods gracefully handle network errors, API failures, and permission
 /// issues by falling back to mock data to ensure the app remains functional.
-class OpenWeatherApiService implements WeatherRepository {
+class OpenWeatherApiService implements WeatherRepository, CurrentWeatherService, WeatherForecastService, RandomWeatherService {
   static const String _apiKey = 'a179131038d53e44738851b4938c5cd0';
   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
   static const String _forecastUrl = 'https://api.openweathermap.org/data/2.5/forecast';
