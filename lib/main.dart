@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 800), // 더 부드러운 전환을 위해 증가
       vsync: this,
     );
     _fadeAnimation = Tween<double>(
@@ -232,7 +232,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInOutCubic, // 더 자연스러운 커브
     ));
     
     // Set initial random image while loading weather data
@@ -272,14 +272,41 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       final hourlyWeatherData = await _weatherService.getHourlyWeather();
       final weeklyWeatherData = await _weatherService.getWeeklyWeather();
       
-      setState(() {
-        _currentWeather = weatherData;
-        _hourlyWeather = hourlyWeatherData;
-        _weeklyWeather = weeklyWeatherData;
-        currentImagePath = newImagePath;
-        _isLoadingWeather = false;
-        _isCurrentLocation = true; // 현재 위치 로드됨
-      });
+      // 첫 번째 로딩이면서 이미지가 바뀌는 경우 애니메이션 적용
+      bool shouldAnimate = currentImagePath.isNotEmpty && 
+                          currentImagePath != newImagePath;
+      
+      if (shouldAnimate) {
+        // 애니메이션과 함께 이미지 전환
+        setState(() {
+          nextImagePath = newImagePath;
+          _currentWeather = weatherData;
+          _hourlyWeather = hourlyWeatherData;
+          _weeklyWeather = weeklyWeatherData;
+          _isLoadingWeather = false;
+          _isCurrentLocation = true;
+          _isAnimating = true;
+        });
+        
+        // 애니메이션 실행
+        _animationController.forward().then((_) {
+          setState(() {
+            currentImagePath = nextImagePath;
+            _isAnimating = false;
+          });
+          _animationController.reset();
+        });
+      } else {
+        // 첫 로딩이거나 동일한 이미지인 경우 애니메이션 없이 직접 설정
+        setState(() {
+          _currentWeather = weatherData;
+          _hourlyWeather = hourlyWeatherData;
+          _weeklyWeather = weeklyWeatherData;
+          currentImagePath = newImagePath;
+          _isLoadingWeather = false;
+          _isCurrentLocation = true;
+        });
+      }
     } catch (e) {
       setState(() {
         _weatherError = e.toString();
@@ -471,23 +498,30 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 : null,
           ),
           
-          // 다음 이미지 (페이드 인)
+          // 다음 이미지 (부드러운 페이드 인과 스케일 애니메이션)
           if (_isAnimating && nextImagePath.isNotEmpty)
             AnimatedBuilder(
               animation: _fadeAnimation,
               builder: (context, child) {
                 return Opacity(
                   opacity: _fadeAnimation.value,
-                  child: Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(nextImagePath),
-                        fit: BoxFit.cover,
-                        onError: (exception, stackTrace) {
-                          debugPrint('Failed to load next image: $nextImagePath');
-                        },
+                  child: Transform.scale(
+                    scale: 1.0 + (0.05 * (1 - _fadeAnimation.value)), // 미세한 줌 효과
+                    child: Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(nextImagePath),
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withOpacity(0.1 * (1 - _fadeAnimation.value)),
+                            BlendMode.darken,
+                          ),
+                          onError: (exception, stackTrace) {
+                            debugPrint('Failed to load next image: $nextImagePath');
+                          },
+                        ),
                       ),
                     ),
                   ),
