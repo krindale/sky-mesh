@@ -19,13 +19,6 @@ SkyMesh is a Flutter-based weather application that provides detailed weather in
 - **Air Quality Index**: Real-time air quality information (AQI)
 - **UV Index**: UV levels and exposure risk assessment
 
-### 📰 Weather News Integration
-- **Location-based Weather News**: News articles related to current location's weather
-- **Extreme Weather Alerts**: Breaking news about severe weather conditions
-- **Climate Change News**: Latest updates on climate and environmental issues
-- **Tabbed Interface**: Easy switching between weather data and news content
-- **External Links**: Direct access to full news articles via browser
-
 ## 🖼️ App Screenshots
 
 <div align="center">
@@ -72,7 +65,6 @@ SkyMesh is a Flutter-based weather application that provides detailed weather in
 - **geolocator ^10.1.0**: GPS location services
 - **http ^1.1.2**: REST API communication
 - **permission_handler ^11.1.0**: System permission management
-- **url_launcher ^6.2.5**: External URL launching for news articles
 
 ### Architecture Patterns
 - **Repository Pattern**: Clean data access abstraction
@@ -82,7 +74,6 @@ SkyMesh is a Flutter-based weather application that provides detailed weather in
 
 ### External APIs
 - **OpenWeatherMap API**: Real-time weather data and forecast information
-- **NewsAPI**: Weather and climate-related news articles
 - **Custom Image Mapping System**: Location-specific background images
 
 ## 📁 Project Structure
@@ -101,8 +92,7 @@ lib/
 │   ├── models/                        # Domain models (SRP)
 │   │   ├── weather_data.dart          # Weather data model
 │   │   ├── hourly_weather_data.dart   # Hourly forecast model
-│   │   ├── weekly_weather_data.dart   # Weekly forecast model
-│   │   └── news_data.dart             # News article model
+│   │   └── weekly_weather_data.dart   # Weekly forecast model
 │   ├── strategies/                    # Strategy pattern (OCP)
 │   │   └── weather_strategy.dart      # Pluggable weather strategies
 │   ├── dependency_injection/          # DI container (DIP)
@@ -117,12 +107,10 @@ lib/
 │       └── location_image_service_impl.dart # Image service impl
 ├── services/                          # Facade layer (compatibility)
 │   ├── weather_service.dart          # Simplified weather facade
-│   ├── location_image_service.dart    # Location-image mapping
-│   └── news_service.dart              # News API service
+│   └── location_image_service.dart    # Location-image mapping
 ├── widgets/                           # Presentation layer
 │   ├── weather_display_widget.dart    # Weather UI components
-│   ├── background_image_widget.dart   # Background management
-│   └── news_list_widget.dart           # News articles display
+│   └── background_image_widget.dart   # Background management
 ├── design_system/                     # UI design system
 │   └── design_system.dart            # Colors and themes
 └── utils/                             # Utility functions
@@ -164,13 +152,7 @@ lib/
    - Sign up at [OpenWeatherMap](https://openweathermap.org/api)
    - Generate API key
 
-2. **Get NewsAPI Key (Optional)**
-   - Sign up at [NewsAPI](https://newsapi.org/)
-   - Generate API key for news functionality
-   - Replace API key in `lib/services/news_service.dart`
-   - If no API key provided, sample news data will be displayed
-
-3. **Environment Setup**
+2. **Environment Setup**
    - Replace API key in `lib/data/services/openweather_api_service.dart`
    - Or configure via `WeatherConfigurationService` in dependency injection
    - Development API key is included in this project
@@ -219,8 +201,6 @@ lib/
 - **iOS Platform Support** expansion
 - **Multi-language Support** (English, Chinese, Japanese)
 - **Widget Features** addition
-- **Enhanced News Categorization** with better filtering
-- **News Bookmark Feature** for saving important articles
 
 ### Medium-term Goals (3-6 months)
 - **Weather Notification Service** implementation

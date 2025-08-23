@@ -41,8 +41,7 @@
       "Bash(do mv \"C:\\flutter\\sky_mesh\\assets\\location_images\\new_images\\melbourne_$weather_00001_.png\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\oceania\\melbourne_$weather.png\")",
       "Bash(do mv \"C:\\flutter\\sky_mesh\\assets\\location_images\\new_images\\shanghai_$weather_00001_.png\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\asia\\shanghai_$weather.png\")",
       "Bash(git checkout:*)",
-      "Bash(git add:*)",
-      "Bash(do cp \"C:/flutter/sky_mesh/assets/location_images/new_images/middle_east_extended_$weather_00001_.png\" \"C:/flutter/sky_mesh/assets/location_images/regional_fallback/middle_east/middle_east_$weather.png\")"
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": [],
