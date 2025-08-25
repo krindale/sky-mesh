@@ -487,14 +487,14 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
         /// Glassmorphism 스타일의 카드 디자인
         decoration: BoxDecoration(
           /// 반투명 검은 배경으로 가독성 확보
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
           
           /// 현대적인 느낌의 둥근 모서리
           borderRadius: BorderRadius.circular(16),
           
           /// 미세한 테두리로 카드 경계 표현
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -532,7 +532,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             Text(
               widget.error ?? 'Unknown error occurred',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),  // 약간 투명한 흰색
+                color: Colors.white.withValues(alpha: 0.8),  // 약간 투명한 흰색
                 fontSize: 14,                          // 상세 설명에 적합한 작은 크기
               ),
               textAlign: TextAlign.center,  // 중앙 정렬로 균형잡힌 레이아웃
@@ -547,7 +547,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
               
               /// 반투명 스타일의 버튼 디자인
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white.withOpacity(0.2),  // 반투명 배경
+                backgroundColor: Colors.white.withValues(alpha: 0.2),  // 반투명 배경
                 foregroundColor: Colors.white,                   // 흰색 텍스트
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),       // 둥근 모서리
@@ -628,7 +628,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
           Text(
             _getCurrentTime(),
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),  // 날씨 정보보다 덜 강조
+              color: Colors.white.withValues(alpha: 0.8),  // 날씨 정보보다 덜 강조
               fontSize: 16,                          // 보조 정보에 적합한 크기
               fontWeight: FontWeight.w400,           // 일반 폰트 가중치
             ),
@@ -685,7 +685,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
                     Text(
                       'Feels like ${widget.weatherData!.feelsLikeString}',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),  // 보조 정보로 약간 투명
+                        color: Colors.white.withValues(alpha: 0.8),  // 보조 정보로 약간 투명
                         fontSize: 18,                          // 체감 온도를 위한 적절한 크기
                         fontWeight: FontWeight.w400,           // 일반 가중치
                       ),
@@ -782,15 +782,15 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
       height: 120,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -803,14 +803,14 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             children: [
               Icon(
                 icon,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
@@ -839,7 +839,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
                 Text(
                   unit,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -852,82 +852,6 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
     );
   }
 
-  Widget _buildWeatherCard({
-    required IconData icon,
-    required String title,
-    required String value,
-    String? subtitle,
-    bool isFullWidth = false,
-  }) {
-    return Container(
-      height: isFullWidth ? 115 : 120,
-      padding: EdgeInsets.all(isFullWidth ? 10 : 16),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                icon,
-                color: Colors.white.withOpacity(0.7),
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ],
-          ),
-          
-          SizedBox(height: isFullWidth ? 8 : 12),
-          
-          Center(
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          
-          if (subtitle != null) ...[
-            SizedBox(height: isFullWidth ? 2 : 4),
-            Text(
-              subtitle,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
-                fontSize: isFullWidth ? 12 : 14,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
 
   /// 새로고침 버튼 UI 구성 메서드
   /// 
@@ -974,14 +898,14 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
         /// Glassmorphism 스타일의 원형 버튼 디자인
         decoration: BoxDecoration(
           /// 반투명 검은 배경으로 유리 같은 효과
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: 0.3),
           
           /// 원형 모양으로 정다운 느낌
           shape: BoxShape.circle,
           
           /// 미세한 테두리로 세련된 느낌 연출
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),   // 연한 테두리
+            color: Colors.white.withValues(alpha: 0.2),   // 연한 테두리
             width: 1,                               // 엷은 두께
           ),
         ),
@@ -989,7 +913,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
         /// 새로고침 아이콘
         child: Icon(
           Icons.refresh,                           // Material Design 새로고침 아이콘
-          color: Colors.white.withOpacity(0.8),    // 고대비를 위한 흰색
+          color: Colors.white.withValues(alpha: 0.8),    // 고대비를 위한 흰색
           size: 22,                                // 버튼 크기에 적합한 아이콘 크기
         ),
       ),
@@ -1039,15 +963,15 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1060,14 +984,14 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             children: [
               Icon(
                 Icons.schedule,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'HOURLY FORECAST',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
@@ -1102,7 +1026,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
           Text(
             isFirst ? 'Now' : forecast.hour,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -1112,12 +1036,12 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               _getWeatherIcon(forecast.iconCode),
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               size: 16,
             ),
           ),
@@ -1134,7 +1058,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
           Text(
             '${forecast.humidity}%',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 10,
               fontWeight: FontWeight.w400,
             ),
@@ -1164,15 +1088,15 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1185,14 +1109,14 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             children: [
               Icon(
                 Icons.calendar_month,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 '7-DAY FORECAST',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
@@ -1222,7 +1146,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             child: Text(
               forecast.isToday ? '오늘' : forecast.dayOfWeek,
               style: TextStyle(
-                color: forecast.isToday ? Colors.white : Colors.white.withOpacity(0.8),
+                color: forecast.isToday ? Colors.white : Colors.white.withValues(alpha: 0.8),
                 fontSize: 14,
                 fontWeight: forecast.isToday ? FontWeight.w600 : FontWeight.w500,
               ),
@@ -1237,7 +1161,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             child: Text(
               forecast.dateString,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
               ),
@@ -1251,12 +1175,12 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               _getWeatherIcon(forecast.iconCode),
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               size: 18,
             ),
           ),
@@ -1268,7 +1192,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             child: Text(
               _getShortWeatherDescription(forecast.description),
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
               ),
@@ -1284,7 +1208,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             child: Text(
               forecast.minTemperatureString,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
               ),
@@ -1330,15 +1254,15 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
       height: 120,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1351,14 +1275,14 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             children: [
               Icon(
                 Icons.air,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'AIR QUALITY',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
@@ -1388,7 +1312,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
                 Text(
                   'AQI',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1406,15 +1330,15 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
       height: 120,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1427,14 +1351,14 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
             children: [
               Icon(
                 Icons.wb_sunny_outlined,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'UV INDEX',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
@@ -1468,7 +1392,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
                 Text(
                   _getUVIndexDescription(widget.weatherData!.uvIndex),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),
@@ -1509,34 +1433,4 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
     return 'Extreme';                       // 11+: 극도로 높음
   }
 
-  /// 대기질 지수에 따른 대기 상태 설명 반환 메서드
-  /// 
-  /// OpenWeatherMap API의 Air Quality Index 기준에 따라
-  /// 대기질 수치를 사용자가 이해하기 쉬운 텍스트로 변환합니다.
-  /// 
-  /// @param airQuality 대기질 지수 (1-5 범위)
-  /// @return String 대기질 상태 설명
-  /// 
-  /// ## 대기질 단계별 설명
-  /// - **1 (Good)**: 좋음 - 모든 사람에게 안전
-  /// - **2 (Fair)**: 보통 - 민감한 사람에게 약간 영향
-  /// - **3 (Moderate)**: 보통 - 민감한 사람에게 영향
-  /// - **4 (Poor)**: 나쁨 - 일반인에게 영향, 민감한 사람에게 심각한 영향
-  /// - **5 (Very Poor)**: 매우 나쁨 - 모든 사람에게 심각한 영향
-  /// 
-  /// ## 건강 영향
-  /// - 호흡기 질환 위험
-  /// - 야외 활동 제한 여부 결정
-  /// - 마스크 착용 필요성 판단
-  String _getAirQualityDescription(int airQuality) {
-    // OpenWeatherMap API 대기질 지수 기준
-    switch (airQuality) {
-      case 1: return 'Good';       // 좋음
-      case 2: return 'Fair';       // 보통 (낮음)
-      case 3: return 'Moderate';   // 보통
-      case 4: return 'Poor';       // 나쁨
-      case 5: return 'Very Poor';  // 매우 나쁨
-      default: return 'Unknown';   // 알 수 없음 (오류 상황)
-    }
-  }
 }

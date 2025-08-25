@@ -33,6 +33,7 @@ import '../interfaces/weather_repository.dart';      // 날씨 데이터 리포�
 import '../interfaces/location_service.dart';        // 위치 서비스 인터페이스
 import '../interfaces/image_service.dart';           // 이미지 서비스 인터페이스
 import '../interfaces/weather_interfaces.dart';      // ISP를 위한 세분화된 날씨 인터페이스들
+import '../models/weather_data.dart';                // WeatherData 모델
 
 // 구체적 구현체 imports (실제 비즈니스 로직)
 import '../../data/services/openweather_api_service.dart';    // OpenWeatherMap API 구현체
@@ -451,9 +452,8 @@ class WeatherDataValidatorImpl implements WeatherDataValidator {
   /// }
   /// ```
   @override
-  bool isValidWeatherData(data) {
-    // 1단계: null 체크 - 가장 기본적인 유효성 검증
-    if (data == null) return false;
+  bool isValidWeatherData(WeatherData data) {
+    // WeatherData is non-nullable, so we can skip null check
     
     // 2단계: 모든 필수 필드의 유효성을 논리 AND로 결합
     // 하나라도 실패하면 전체가 false가 됨

@@ -15,7 +15,7 @@ void main() {
 
         expect(imagePath, contains('seoul'));
         expect(imagePath, contains('sunny'));
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
       });
 
       test('returns same country city when exact match not available', () {
@@ -29,7 +29,7 @@ void main() {
 
         expect(imagePath, contains('seoul'));
         expect(imagePath, contains('sunny'));
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
       });
 
       test('returns regional fallback when no city for country', () {
@@ -40,7 +40,7 @@ void main() {
         );
 
         // Should return a valid image path (either random city or fallback)
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
         expect(imagePath, isNotEmpty);
       });
 
@@ -81,7 +81,7 @@ void main() {
         );
 
         // The result should be valid regardless of weather mapping
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
         expect(imagePath, isNotEmpty);
       });
 
@@ -107,7 +107,7 @@ void main() {
         );
 
         // Should still return a valid path (random city from same country)
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
         expect(imagePath, isNotEmpty);
       });
 
@@ -183,7 +183,7 @@ void main() {
           weatherDescription: 'clear sky',
         );
 
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
         expect(imagePath, isNotEmpty);
       });
 
@@ -194,7 +194,7 @@ void main() {
           weatherDescription: '',
         );
 
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
         expect(imagePath, isNotEmpty);
       });
 
@@ -205,7 +205,7 @@ void main() {
           weatherDescription: 'clear sky',
         );
 
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
         expect(imagePath, isNotEmpty);
       });
 
@@ -218,7 +218,7 @@ void main() {
           longitude: null,
         );
 
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
         expect(imagePath, isNotEmpty);
       });
 
@@ -255,7 +255,7 @@ void main() {
         );
 
         expect(imagePath, contains('new_york'));
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
       });
     });
 
@@ -289,7 +289,7 @@ void main() {
         );
 
         expect(imagePath, startsWith('assets/'));
-        expect(imagePath, endsWith('.png'));
+        expect(imagePath, endsWith('.webp'));
         expect(imagePath, contains('seoul'));
         expect(imagePath, contains('sunny'));
       });

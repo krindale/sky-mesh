@@ -1,3 +1,5 @@
+import '../utils/logger.dart';
+
 /// Weather data model following SRP (Single Responsibility Principle)
 /// Only responsible for weather data representation
 /// 
@@ -102,12 +104,12 @@ class WeatherData {
         ? DateTime.fromMillisecondsSinceEpoch(sunsetTimestamp * 1000)
         : null;
     
-    print('📡 API Response - Raw timestamps: sunrise=$sunriseTimestamp, sunset=$sunsetTimestamp');
+    Logger.api('Raw timestamps: sunrise=$sunriseTimestamp, sunset=$sunsetTimestamp');
     if (sunrise != null && sunset != null) {
-      print('📡 API Response - Parsed times: sunrise=${sunrise.toLocal()}, sunset=${sunset.toLocal()}');
-      print('📡 API Response - UTC times: sunrise=$sunrise, sunset=$sunset');
+      Logger.api('Parsed times: sunrise=${sunrise.toLocal()}, sunset=${sunset.toLocal()}');
+      Logger.api('UTC times: sunrise=$sunrise, sunset=$sunset');
     } else {
-      print('⚠️ API Response - Missing sunrise/sunset data');
+      Logger.warning('Missing sunrise/sunset data in API response');
     }
     
     return WeatherData(
@@ -145,7 +147,7 @@ class WeatherData {
   String get humidityString => '$humidity%';
   
   /// Atmospheric pressure formatted with unit (e.g., "1013 hPa")
-  String get pressureString => '${pressure} hPa';
+  String get pressureString => '$pressure hPa';
   
   /// Visibility formatted in kilometers (e.g., "10.0 km")
   String get visibilityString => '${(visibility / 1000).toStringAsFixed(1)} km';

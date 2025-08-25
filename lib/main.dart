@@ -25,12 +25,11 @@
 
 // Flutter 프레임워크 관련 imports
 import 'package:flutter/material.dart'; // Material Design 컴포넌트
-import 'package:flutter/services.dart'; // 시스템 서비스 (현재 미사용, 향후 확장용)
 import 'dart:async'; // 비동기 프로그래밍 (Timer 등)
 
 // 애플리케이션 모듈 imports (계층별로 구성)
 import 'design_system/design_system.dart'; // 디자인 시스템 (색상, 타이포그래피 등)
-import 'widgets/background_image_widget.dart'; // 배경 이미지 위젯 (현재 미사용)
+// background_image_widget.dart는 현재 미사용으로 import 제거
 import 'utils/image_assets.dart'; // 이미지 에셋 관리 유틸리티
 import 'services/weather_service.dart'; // 날씨 서비스 파사드
 import 'services/location_image_service.dart'; // 위치-이미지 매핑 서비스
@@ -39,6 +38,7 @@ import 'core/dependency_injection/service_locator.dart'; // DI 컨테이너
 import 'core/models/weather_data.dart'; // 날씨 데이터 모델
 import 'core/models/hourly_weather_data.dart'; // 시간별 날씨 데이터 모델
 import 'core/models/weekly_weather_data.dart'; // 주간 날씨 데이터 모델
+import 'core/utils/logger.dart'; // 로깅 유틸리티
 
 /// 애플리케이션 진입점
 ///
@@ -266,6 +266,8 @@ class _HomePageState extends State<HomePage>
         weatherDescription: weatherData.description,
         latitude: weatherData.latitude,
         longitude: weatherData.longitude,
+        sunrise: weatherData.sunrise,
+        sunset: weatherData.sunset,
       );
 
       // 시간별 날씨와 일주일 날씨 데이터도 함께 로드
@@ -337,6 +339,8 @@ class _HomePageState extends State<HomePage>
         weatherDescription: randomWeatherData.description,
         latitude: randomWeatherData.latitude,
         longitude: randomWeatherData.longitude,
+        sunrise: randomWeatherData.sunrise,
+        sunset: randomWeatherData.sunset,
       );
 
       // 랜덤 도시의 시간별 날씨와 일주일 날씨도 가져오기
@@ -357,7 +361,7 @@ class _HomePageState extends State<HomePage>
               );
         }
       } catch (e) {
-        print('시간별/일주일 날씨 로드 실패: $e');
+        Logger.debug('시간별/일주일 날씨 로드 실패: $e');
       }
 
       setState(() {
@@ -428,6 +432,8 @@ class _HomePageState extends State<HomePage>
         weatherDescription: updatedWeather.description,
         latitude: updatedWeather.latitude,
         longitude: updatedWeather.longitude,
+        sunrise: updatedWeather.sunrise,
+        sunset: updatedWeather.sunset,
       );
 
       // 갱신된 시간별 날씨와 일주일 날씨도 함께 로드
@@ -451,7 +457,7 @@ class _HomePageState extends State<HomePage>
               );
         }
       } catch (e) {
-        print('시간별/일주일 날씨 갱신 실패: $e');
+        Logger.debug('시간별/일주일 날씨 갱신 실패: $e');
       }
 
       setState(() {
@@ -520,8 +526,8 @@ class _HomePageState extends State<HomePage>
                         image: AssetImage(nextImagePath),
                         fit: BoxFit.cover,
                         colorFilter: ColorFilter.mode(
-                          Colors.black.withOpacity(
-                            0.1 * (1 - _fadeAnimation.value),
+                          Colors.black.withValues(
+                            alpha: 0.1 * (1 - _fadeAnimation.value),
                           ),
                           BlendMode.darken,
                         ),
@@ -559,7 +565,7 @@ class _HomePageState extends State<HomePage>
             FloatingActionButton(
               heroTag: "home_button",
               onPressed: _isAnimating ? null : _loadWeatherData,
-              backgroundColor: LowPolyColors.primaryBlue.withOpacity(0.9),
+              backgroundColor: LowPolyColors.primaryBlue.withValues(alpha: 0.9),
               foregroundColor: LowPolyColors.textOnDark,
               elevation: 8,
               tooltip: 'Current Location Weather',
@@ -571,7 +577,7 @@ class _HomePageState extends State<HomePage>
           FloatingActionButton(
             heroTag: "random_button",
             onPressed: _isAnimating ? null : _changeRandomImage,
-            backgroundColor: LowPolyColors.primaryBlue.withOpacity(0.9),
+            backgroundColor: LowPolyColors.primaryBlue.withValues(alpha: 0.9),
             foregroundColor: LowPolyColors.textOnDark,
             elevation: 8,
             tooltip: 'Random City Weather',
@@ -596,7 +602,7 @@ class _HomePageState extends State<HomePage>
     // 30분마다 자동으로 현재 선택된 지역의 날씨를 갱신
     _autoRefreshTimer = Timer.periodic(const Duration(minutes: 30), (timer) {
       if (!_isLoadingWeather && _currentWeather != null) {
-        print('🔄 자동 날씨 갱신 시작 (30분 주기)');
+        Logger.debug('🔄 자동 날씨 갱신 시작 (30분 주기)');
         _refreshCurrentWeather();
       }
     });

@@ -120,10 +120,10 @@ class WeatherService {
   /// ```dart
   /// try {
   ///   final randomWeather = await weatherService.getRandomCityWeather();
-  ///   print('랜덤 도시: ${randomWeather.cityName}');
-  ///   print('온도: ${randomWeather.temperatureString}');
+  ///   Logger.debug(랜덤 도시: ${randomWeather.cityName}');
+  ///   Logger.debug(온도: ${randomWeather.temperatureString}');
   /// } catch (e) {
-  ///   print('랜덤 날씨 조회 실패: $e');
+  ///   Logger.debug(랜덤 날씨 조회 실패: $e');
   /// }
   /// ```
   /// 
@@ -147,10 +147,10 @@ class WeatherService {
   /// ```dart
   /// try {
   ///   final currentWeather = await weatherService.getCurrentWeather();
-  ///   print('현재 위치: ${currentWeather.cityName}');
-  ///   print('온도: ${currentWeather.temperatureString}');
+  ///   Logger.debug(현재 위치: ${currentWeather.cityName}');
+  ///   Logger.debug(온도: ${currentWeather.temperatureString}');
   /// } catch (e) {
-  ///   print('현재 날씨 조회 실패: $e');
+  ///   Logger.debug(현재 날씨 조회 실패: $e');
   /// }
   /// ```
   /// 
@@ -182,9 +182,9 @@ class WeatherService {
   /// try {
   ///   // 서울의 좌표
   ///   final seoulWeather = await weatherService.getWeatherByCoordinates(37.5665, 126.9780);
-  ///   print('서울 날씨: ${seoulWeather.temperatureString}');
+  ///   Logger.debug(서울 날씨: ${seoulWeather.temperatureString}');
   /// } catch (e) {
-  ///   print('좌표별 날씨 조회 실패: $e');
+  ///   Logger.debug(좌표별 날씨 조회 실패: $e');
   /// }
   /// ```
   /// 
@@ -209,10 +209,10 @@ class WeatherService {
   /// try {
   ///   final hourlyData = await weatherService.getHourlyWeather();
   ///   for (final forecast in hourlyData.hourlyForecasts) {
-  ///     print('${forecast.hour}: ${forecast.temperatureString}');
+  ///     Logger.debug(${forecast.hour}: ${forecast.temperatureString}');
   ///   }
   /// } catch (e) {
-  ///   print('시간별 날씨 조회 실패: $e');
+  ///   Logger.debug(시간별 날씨 조회 실패: $e');
   /// }
   /// ```
   /// 
@@ -239,9 +239,9 @@ class WeatherService {
   /// try {
   ///   // 도쿄의 시간별 날씨
   ///   final tokyoHourly = await weatherService.getHourlyWeatherByCoordinates(35.6762, 139.6503);
-  ///   print('도쿄 내일 오전 9시: ${tokyoHourly.hourlyForecasts[9].temperatureString}');
+  ///   Logger.debug(도쿄 내일 오전 9시: ${tokyoHourly.hourlyForecasts[9].temperatureString}');
   /// } catch (e) {
-  ///   print('좌표별 시간별 날씨 조회 실패: $e');
+  ///   Logger.debug(좌표별 시간별 날씨 조회 실패: $e');
   /// }
   /// ```
   /// 
@@ -266,10 +266,10 @@ class WeatherService {
   /// try {
   ///   final weeklyData = await weatherService.getWeeklyWeather();
   ///   for (final daily in weeklyData.dailyForecasts) {
-  ///     print('${daily.dayOfWeek}: ${daily.maxTemperatureString}/${daily.minTemperatureString}');
+  ///     Logger.debug(${daily.dayOfWeek}: ${daily.maxTemperatureString}/${daily.minTemperatureString}');
   ///   }
   /// } catch (e) {
-  ///   print('주간 날씨 조회 실패: $e');
+  ///   Logger.debug(주간 날씨 조회 실패: $e');
   /// }
   /// ```
   /// 
@@ -297,9 +297,9 @@ class WeatherService {
   /// try {
   ///   // 파리의 주간 날씨
   ///   final parisWeekly = await weatherService.getWeeklyWeatherByCoordinates(48.8566, 2.3522);
-  ///   print('파리 주말 날씨: ${parisWeekly.dailyForecasts[6].description}');
+  ///   Logger.debug(파리 주말 날씨: ${parisWeekly.dailyForecasts[6].description}');
   /// } catch (e) {
-  ///   print('좌표별 주간 날씨 조회 실패: $e');
+  ///   Logger.debug(좌표별 주간 날씨 조회 실패: $e');
   /// }
   /// ```
   /// 

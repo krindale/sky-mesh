@@ -55,7 +55,7 @@ void main() {
       final homeButtons = find.byIcon(Icons.home);
       
       // We expect either 0 or 1 home button depending on whether we switched locations
-      expect(homeButtons, findsAtMost(1));
+      expect(homeButtons.evaluate().length, lessThanOrEqualTo(1));
     });
 
     testWidgets('Weather display widget is present', (WidgetTester tester) async {
@@ -151,7 +151,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Navigate away to trigger disposal
-      await tester.pumpWidget(const MaterialApp(home: Container()));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold()));
       
       // Should not have memory leaks or exceptions
       expect(tester.takeException(), isNull);

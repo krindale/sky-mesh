@@ -76,7 +76,7 @@ class LowPolyComponents {
       end: Alignment.bottomRight,
       colors: [
         LowPolyColors.surfaceLight,
-        LowPolyColors.surfaceLight.withOpacity(0.8),
+        LowPolyColors.surfaceLight.withValues(alpha: 0.8),
       ],
     ),
   );
@@ -285,7 +285,7 @@ class WeatherIcon extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: iconColor.withOpacity(0.1),
+        color: iconColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(LowPolySpacing.radiusMd),
         boxShadow: LowPolyShadows.getWeatherShadow(weather),
       ),
