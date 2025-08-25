@@ -12,6 +12,8 @@ class LocationImageServiceImpl implements ImageService {
     required String weatherDescription,
     double? latitude,
     double? longitude,
+    DateTime? sunrise,
+    DateTime? sunset,
   }) {
     // Delegate to existing LocationImageService for now
     // This maintains backward compatibility while following new architecture
@@ -21,6 +23,8 @@ class LocationImageServiceImpl implements ImageService {
       weatherDescription: weatherDescription,
       latitude: latitude,
       longitude: longitude,
+      sunrise: sunrise,
+      sunset: sunset,
     );
   }
 

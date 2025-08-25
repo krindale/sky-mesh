@@ -6,6 +6,8 @@ abstract class ImageService {
     required String weatherDescription,
     double? latitude,
     double? longitude,
+    DateTime? sunrise,
+    DateTime? sunset,
   });
   
   String getRandomImagePath();

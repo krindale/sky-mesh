@@ -57,11 +57,13 @@ class WeatherData {
   final int airQuality;
   final double? latitude;
   final double? longitude;
+  final DateTime? sunrise;
+  final DateTime? sunset;
 
   /// Creates a new WeatherData instance
   /// 
-  /// All weather parameters are required except [latitude] and [longitude]
-  /// which are optional for cases where precise coordinates are not available.
+  /// All weather parameters are required except [latitude], [longitude], [sunrise], and [sunset]
+  /// which are optional for cases where precise coordinates or timing are not available.
   WeatherData({
     required this.temperature,
     required this.feelsLike,
@@ -77,6 +79,8 @@ class WeatherData {
     required this.airQuality,
     this.latitude,
     this.longitude,
+    this.sunrise,
+    this.sunset,
   });
 
   /// Creates a WeatherData instance from OpenWeatherMap API JSON response
@@ -87,6 +91,25 @@ class WeatherData {
   /// Note: UV index and air quality currently use mock data as they
   /// require separate API calls from OpenWeatherMap.
   factory WeatherData.fromJson(Map<String, dynamic> json) {
+    // API 응답에서 sunrise/sunset 데이터 확인을 위한 로그
+    final sunriseTimestamp = json['sys']['sunrise'];
+    final sunsetTimestamp = json['sys']['sunset'];
+    
+    final sunrise = sunriseTimestamp != null 
+        ? DateTime.fromMillisecondsSinceEpoch(sunriseTimestamp * 1000)
+        : null;
+    final sunset = sunsetTimestamp != null
+        ? DateTime.fromMillisecondsSinceEpoch(sunsetTimestamp * 1000)
+        : null;
+    
+    print('📡 API Response - Raw timestamps: sunrise=$sunriseTimestamp, sunset=$sunsetTimestamp');
+    if (sunrise != null && sunset != null) {
+      print('📡 API Response - Parsed times: sunrise=${sunrise.toLocal()}, sunset=${sunset.toLocal()}');
+      print('📡 API Response - UTC times: sunrise=$sunrise, sunset=$sunset');
+    } else {
+      print('⚠️ API Response - Missing sunrise/sunset data');
+    }
+    
     return WeatherData(
       temperature: json['main']['temp'].toDouble(),
       feelsLike: json['main']['feels_like'].toDouble(),
@@ -102,6 +125,8 @@ class WeatherData {
       airQuality: 2, // TODO: Implement separate air quality API call
       latitude: json['coord']['lat']?.toDouble(),
       longitude: json['coord']['lon']?.toDouble(),
+      sunrise: sunrise,
+      sunset: sunset,
     );
   }
 
