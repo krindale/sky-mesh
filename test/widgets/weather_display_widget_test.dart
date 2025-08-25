@@ -18,6 +18,9 @@ void main() {
       visibility: 10000,
       uvIndex: 5,
       airQuality: 2,
+      pm25: 15.0,
+      pm10: 25.0,
+      precipitationProbability: 0.2,
       latitude: 37.5665,
       longitude: 126.9780,
     );
@@ -195,8 +198,11 @@ void main() {
           country: 'TC',
           pressure: 1013,
           visibility: 10000,
-          uvIndex: uvIndex,
+          uvIndex: uvIndex.toDouble(),
           airQuality: 2,
+          pm25: 12.0,
+          pm10: 22.0,
+          precipitationProbability: 0.1,
         );
 
         await tester.pumpWidget(
@@ -301,6 +307,9 @@ void main() {
         visibility: 12500,
         uvIndex: 7,
         airQuality: 3,
+        pm25: 18.0,
+        pm10: 28.0,
+        precipitationProbability: 0.3,
       );
 
       expect(weatherData.temperatureString, '23°');

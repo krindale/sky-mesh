@@ -553,6 +553,9 @@ class _HomePageState extends State<HomePage>
               error: _weatherError,
               onRefresh: _refreshCurrentWeather,
               scrollController: _scrollController,
+              conditionCards: _currentWeather != null 
+                  ? _weatherService.getWeatherConditionCards(_currentWeather!)
+                  : null,
             ),
           ),
         ],

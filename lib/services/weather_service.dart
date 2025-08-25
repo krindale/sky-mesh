@@ -35,6 +35,10 @@ import '../core/interfaces/image_service.dart';           // 이미지 서비스
 import '../core/models/weather_data.dart';               // 현재 날씨 데이터 모델
 import '../core/models/hourly_weather_data.dart';        // 시간별 날씨 예보 모델
 import '../core/models/weekly_weather_data.dart';        // 주간 날씨 예보 모델
+import '../core/models/weather_condition_card.dart';     // 날씨 컨디션 카드 모델
+
+// 서비스 imports
+import '../core/services/weather_condition_rule_engine.dart'; // 날씨 컨디션 규칙 엔진
 
 // 의존성 주입 imports
 import '../core/dependency_injection/service_locator.dart';  // 서비스 로케이터
@@ -73,6 +77,10 @@ class WeatherService {
   /// ImageService 인터페이스를 통해 위치별 배경 이미지 관리
   final ImageService _imageService;
 
+  /// 날씨 컨디션 카드 규칙을 평가하는 엔진
+  /// 날씨 조건에 따라 적절한 알림 카드를 생성
+  final WeatherConditionRuleEngine _ruleEngine;
+
   /// WeatherService 생성자
   /// 
   /// 의존성 주입을 통해 서비스들을 초기화합니다.
@@ -100,8 +108,10 @@ class WeatherService {
   WeatherService({
     WeatherRepository? weatherRepository,
     ImageService? imageService,
+    WeatherConditionRuleEngine? ruleEngine,
   }) : _weatherRepository = weatherRepository ?? ServiceLocator().get<WeatherRepository>(),
-       _imageService = imageService ?? ServiceLocator().get<ImageService>();
+       _imageService = imageService ?? ServiceLocator().get<ImageService>(),
+       _ruleEngine = ruleEngine ?? WeatherConditionRuleEngine();
 
   // ====================================================================
   // 날씨 데이터 조회 메서드들
@@ -373,6 +383,99 @@ class WeatherService {
     );
   }
 
+  // ====================================================================
+  // 날씨 컨디션 카드 메서드들
+  // WeatherConditionRuleEngine에 위임하여 조건별 알림 카드 생성
+  // ====================================================================
+
+  /// 날씨 조건에 따른 컨디션 카드 목록 조회
+  /// 
+  /// 현재 날씨 데이터를 분석하여 사용자에게 유용한 정보를 제공하는
+  /// 컨디션 카드들을 생성합니다. 폭염/한파, 자외선, 미세먼지, 강풍,
+  /// 생활지수 등 다양한 카테고리의 알림을 포함합니다.
+  /// 
+  /// @param weatherData 분석할 날씨 데이터
+  /// @return List<WeatherConditionCard> 적용되는 컨디션 카드들
+  /// 
+  /// ## 지원 카드 유형
+  /// - **폭염/한파**: 33°C 이상 또는 -12°C 이하 시 알림
+  /// - **자외선**: UV 지수 6 이상 시 알림
+  /// - **미세먼지**: PM2.5 36µg/m³ 이상 또는 AQI 4 이상 시 알림
+  /// - **강풍**: 풍속 9m/s 이상 시 알림
+  /// - **생활지수**: 세차/빨래하기 좋은 조건 시 알림
+  /// 
+  /// ## 사용 예시
+  /// ```dart
+  /// final currentWeather = await weatherService.getCurrentWeather();
+  /// final conditionCards = weatherService.getWeatherConditionCards(currentWeather);
+  /// 
+  /// // UI에서 카드 표시
+  /// for (final card in conditionCards) {
+  ///   showWeatherCard(card);
+  /// }
+  /// ```
+  /// 
+  /// ## 카드 우선순위
+  /// 1. **위험(danger)**: 빨간색 - 즉시 주의 필요
+  /// 2. **경고(warning)**: 주황색 - 주의 필요  
+  /// 3. **정보(info)**: 파란색 - 참고용 정보
+  List<WeatherConditionCard> getWeatherConditionCards(
+    WeatherData weatherData,
+  ) {
+    return _ruleEngine.evaluateConditions(weatherData);
+  }
+
+  /// 특정 카드 유형의 활성화 여부 확인
+  /// 
+  /// 현재 날씨 조건에서 특정 유형의 컨디션 카드가 표시되는지 확인합니다.
+  /// UI에서 특정 카드의 존재 여부만 필요할 때 사용합니다.
+  /// 
+  /// @param weatherData 분석할 날씨 데이터
+  /// @param cardType 확인할 카드 유형
+  /// @return bool 해당 카드 유형이 활성화되었는지 여부
+  /// 
+  /// ## 사용 예시
+  /// ```dart
+  /// final weather = await weatherService.getCurrentWeather();
+  /// final hasHeatWaveAlert = weatherService.hasActiveConditionCard(
+  ///   weather, 
+  ///   WeatherCardType.heatWave,
+  /// );
+  /// 
+  /// if (hasHeatWaveAlert) {
+  ///   showHeatWaveIcon();
+  /// }
+  /// ```
+  bool hasActiveConditionCard(
+    WeatherData weatherData,
+    WeatherCardType cardType,
+  ) {
+    final cards = getWeatherConditionCards(weatherData);
+    return cards.any((card) => card.type == cardType);
+  }
+
+  /// 최고 심각도의 컨디션 카드 조회
+  /// 
+  /// 현재 활성화된 컨디션 카드 중에서 가장 높은 심각도를 가진
+  /// 카드를 반환합니다. 메인 UI에서 대표 알림을 표시할 때 유용합니다.
+  /// 
+  /// @param weatherData 분석할 날씨 데이터
+  /// @return WeatherConditionCard? 가장 심각한 카드 (없으면 null)
+  /// 
+  /// ## 심각도 순서
+  /// 1. **danger** (위험): 즉시 행동 필요
+  /// 2. **warning** (경고): 주의 필요
+  /// 3. **info** (정보): 참고용
+  WeatherConditionCard? getMostCriticalConditionCard(
+    WeatherData weatherData,
+  ) {
+    final cards = getWeatherConditionCards(weatherData);
+    if (cards.isEmpty) return null;
+    
+    // 이미 우선순위대로 정렬되어 반환되므로 첫 번째가 가장 심각
+    return cards.first;
+  }
+
   /// 랜덤 배경 이미지 경로 조회
   /// 
   /// 468개의 로우폴리 배경 이미지 중에서 무작위로 하나를 선택하여 반환합니다.
@@ -402,5 +505,136 @@ class WeatherService {
   /// - 데모 모드나 미리보기 기능
   String getRandomImagePath() {
     return _imageService.getRandomImagePath();
+  }
+
+  // ====================================================================
+  // 부분 업데이트 메서드들
+  // 특정 API가 준비되었을 때 기존 날씨 데이터의 일부만 업데이트
+  // ====================================================================
+
+  /// UV 지수 데이터를 업데이트하고 관련 컨디션 카드를 갱신
+  /// 
+  /// UV API가 준비되었을 때 기존 WeatherData의 UV 지수만 업데이트하고,
+  /// UV 관련 컨디션 카드를 재평가합니다.
+  /// 
+  /// @param weatherData 기존 날씨 데이터
+  /// @param uvIndex 새로운 UV 지수 값
+  /// @return WeatherData UV 지수가 업데이트된 날씨 데이터
+  /// 
+  /// ## 사용 예시
+  /// ```dart
+  /// final updatedWeather = weatherService.updateUVIndex(
+  ///   currentWeatherData,
+  ///   7.5, // UV API에서 받은 값
+  /// );
+  /// 
+  /// // 갱신된 컨디션 카드 조회
+  /// final updatedCards = weatherService.getWeatherConditionCards(updatedWeather);
+  /// ```
+  WeatherData updateUVIndex(WeatherData weatherData, double uvIndex) {
+    return WeatherData(
+      temperature: weatherData.temperature,
+      feelsLike: weatherData.feelsLike,
+      humidity: weatherData.humidity,
+      windSpeed: weatherData.windSpeed,
+      description: weatherData.description,
+      iconCode: weatherData.iconCode,
+      cityName: weatherData.cityName,
+      country: weatherData.country,
+      pressure: weatherData.pressure,
+      visibility: weatherData.visibility,
+      uvIndex: uvIndex, // 업데이트된 UV 지수
+      airQuality: weatherData.airQuality,
+      pm25: weatherData.pm25,
+      pm10: weatherData.pm10,
+      precipitationProbability: weatherData.precipitationProbability,
+      latitude: weatherData.latitude,
+      longitude: weatherData.longitude,
+      sunrise: weatherData.sunrise,
+      sunset: weatherData.sunset,
+    );
+  }
+
+  /// 대기질 데이터를 업데이트하고 관련 컨디션 카드를 갱신
+  /// 
+  /// 대기질 API가 준비되었을 때 기존 WeatherData의 대기질 정보만 업데이트하고,
+  /// 대기질 관련 컨디션 카드를 재평가합니다.
+  /// 
+  /// @param weatherData 기존 날씨 데이터
+  /// @param airQuality 대기질 지수 (1-5 스케일)
+  /// @param pm25 PM2.5 농도 (µg/m³)
+  /// @param pm10 PM10 농도 (µg/m³)
+  /// @return WeatherData 대기질이 업데이트된 날씨 데이터
+  /// 
+  /// ## 사용 예시
+  /// ```dart
+  /// final updatedWeather = weatherService.updateAirQuality(
+  ///   currentWeatherData,
+  ///   4, // AQI 지수
+  ///   45.2, // PM2.5 농도
+  ///   78.1, // PM10 농도
+  /// );
+  /// 
+  /// // 갱신된 컨디션 카드 조회
+  /// final updatedCards = weatherService.getWeatherConditionCards(updatedWeather);
+  /// ```
+  WeatherData updateAirQuality(
+    WeatherData weatherData, 
+    int airQuality, 
+    double pm25, 
+    double pm10,
+  ) {
+    return WeatherData(
+      temperature: weatherData.temperature,
+      feelsLike: weatherData.feelsLike,
+      humidity: weatherData.humidity,
+      windSpeed: weatherData.windSpeed,
+      description: weatherData.description,
+      iconCode: weatherData.iconCode,
+      cityName: weatherData.cityName,
+      country: weatherData.country,
+      pressure: weatherData.pressure,
+      visibility: weatherData.visibility,
+      uvIndex: weatherData.uvIndex,
+      airQuality: airQuality, // 업데이트된 대기질 지수
+      pm25: pm25, // 업데이트된 PM2.5
+      pm10: pm10, // 업데이트된 PM10
+      precipitationProbability: weatherData.precipitationProbability,
+      latitude: weatherData.latitude,
+      longitude: weatherData.longitude,
+      sunrise: weatherData.sunrise,
+      sunset: weatherData.sunset,
+    );
+  }
+
+  /// 특정 카드 유형의 컨디션 카드만 조회
+  /// 
+  /// 특정 API 데이터가 업데이트된 후 해당하는 컨디션 카드만 
+  /// 선별적으로 조회할 때 사용합니다.
+  /// 
+  /// @param weatherData 분석할 날씨 데이터
+  /// @param cardTypes 조회할 카드 유형들
+  /// @return List<WeatherConditionCard> 지정된 유형의 컨디션 카드들
+  /// 
+  /// ## 사용 예시
+  /// ```dart
+  /// // UV 관련 카드만 조회
+  /// final uvCards = weatherService.getSpecificConditionCards(
+  ///   weatherData, 
+  ///   [WeatherCardType.uvIndex],
+  /// );
+  /// 
+  /// // 대기질 관련 카드만 조회  
+  /// final airQualityCards = weatherService.getSpecificConditionCards(
+  ///   weatherData, 
+  ///   [WeatherCardType.airQuality],
+  /// );
+  /// ```
+  List<WeatherConditionCard> getSpecificConditionCards(
+    WeatherData weatherData,
+    List<WeatherCardType> cardTypes,
+  ) {
+    final allCards = _ruleEngine.evaluateConditions(weatherData);
+    return allCards.where((card) => cardTypes.contains(card.type)).toList();
   }
 }

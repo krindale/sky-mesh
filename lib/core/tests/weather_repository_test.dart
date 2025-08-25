@@ -95,6 +95,9 @@ class MockWeatherRepository implements WeatherRepository {
       visibility: 10000,
       uvIndex: 3,
       airQuality: 1,
+      pm25: 10.0,
+      pm10: 20.0,
+      precipitationProbability: 0.1,
     );
   }
 
