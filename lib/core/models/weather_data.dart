@@ -165,7 +165,7 @@ class WeatherData {
   String get visibilityString => '${(visibility / 1000).toStringAsFixed(1)} km';
   
   /// UV index as string (e.g., "5" or "-" if not available)
-  String get uvIndexString => uvIndex?.toString() ?? '-';
+  String get uvIndexString => uvIndex?.round().toString() ?? '-';
   
   /// Air quality index as string (e.g., "2" or "-" if not available)
   String get airQualityString => airQuality?.toString() ?? '-';

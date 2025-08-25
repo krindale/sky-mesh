@@ -89,13 +89,17 @@ void main() {
       
       // Check weather details
       expect(find.text('WIND'), findsOneWidget);
-      expect(find.text('3.2 m/s'), findsOneWidget);
+      expect(find.text('3.2'), findsOneWidget);
+      expect(find.text('m/s'), findsOneWidget);
       expect(find.text('HUMIDITY'), findsOneWidget);
-      expect(find.text('65%'), findsOneWidget);
+      expect(find.text('65'), findsOneWidget);
+      expect(find.text('%'), findsOneWidget);
       expect(find.text('PRESSURE'), findsOneWidget);
-      expect(find.text('1013 hPa'), findsOneWidget);
+      expect(find.text('1013'), findsOneWidget);
+      expect(find.text('hPa'), findsOneWidget);
       expect(find.text('VISIBILITY'), findsOneWidget);
-      expect(find.text('10.0 km'), findsOneWidget);
+      expect(find.text('10.0'), findsOneWidget);
+      expect(find.text('km'), findsOneWidget);
       expect(find.text('UV INDEX'), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
     });
@@ -288,7 +292,7 @@ void main() {
       expect(weatherData.country, 'JP');
       expect(weatherData.pressure, 1015);
       expect(weatherData.visibility, 8000);
-      expect(weatherData.uvIndex, 5); // Default value
+      expect(weatherData.uvIndex, null); // No UV data provided
       expect(weatherData.latitude, 35.6762);
       expect(weatherData.longitude, 139.6503);
     });
