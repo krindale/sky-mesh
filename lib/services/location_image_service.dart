@@ -41,8 +41,7 @@
 /// @since 1.0.0
 
 import 'dart:math';  // 랜덤 숫자 생성을 위한 수학 라이브러리
-
-import '../utils/image_assets.dart';  // ImageAssets 클래스 import
+import '../core/utils/logger.dart';
 
 /// 위치와 날씨에 따른 이미지 선택 서비스
 /// 
@@ -550,8 +549,8 @@ class LocationImageService {
     DateTime? sunset,
   }) {
     final weather = _mapWeatherCondition(weatherDescription, sunrise: sunrise, sunset: sunset);
-    print('🌍 Location: $cityName, $countryCode ($latitude, $longitude)');
-    print('🌤️  Weather: $weatherDescription → $weather');
+    Logger.location('$cityName, $countryCode ($latitude, $longitude)');
+    Logger.weather('$weatherDescription → $weather');
     
     // 우선순위 1: 정확한 도시명 매치 (예: 'seoul' → seoul_cloudy.webp)
     final cityKey = cityName.toLowerCase().replaceAll(' ', '');
@@ -559,7 +558,7 @@ class LocationImageService {
       final cityImageNames = _cityImages[cityKey]!;
       final selectedCity = cityImageNames[Random().nextInt(cityImageNames.length)];
       final imagePath = _buildImagePath(selectedCity, weather, latitude: latitude, longitude: longitude);
-      print('✅ [1] Exact city match: $imagePath');
+      Logger.image('✅ [1] Exact city match: $imagePath');
       return imagePath;
     }
     
@@ -570,12 +569,12 @@ class LocationImageService {
       // 중국의 경우: 특별한 지역별 처리를 위해 조건부 스킵
       if (countryCode == 'CN' && !countryCities.contains(cityKey)) {
         // 중국이지만 지원하지 않는 도시인 경우, 지역 폴백으로 넘어감
-        print('🇨🇳 Unsupported Chinese city, checking regional fallback...');
+        Logger.debug('🇨🇳 Unsupported Chinese city, checking regional fallback...');
       } 
       // 인도의 경우: 방갈로르/뭄바이가 아닌 도시는 지역 폴백 사용
       else if (countryCode == 'IN' && !countryCities.contains(cityKey)) {
         // 인도이지만 방갈로르/뭄바이가 아닌 경우, 지역 폴백으로 넘어감
-        print('🇮🇳 Non-Bangalore/Mumbai Indian city, using regional fallback...');
+        Logger.debug('🇮🇳 Non-Bangalore/Mumbai Indian city, using regional fallback...');
       } else {
         // 2a. 위치정보 있으면 같은 나라에서 가장 가까운 도시
         if (latitude != null && longitude != null) {
@@ -583,7 +582,7 @@ class LocationImageService {
           final cityImageNames = _cityImages[nearestCity]!;
           final selectedCityImage = cityImageNames[Random().nextInt(cityImageNames.length)];
           final imagePath = _buildImagePath(selectedCityImage, weather, latitude: latitude, longitude: longitude);
-          print('✅ [2a] Same country nearest city: $imagePath');
+          Logger.debug('✅ [2a] Same country nearest city: $imagePath');
           return imagePath;
         }
         
@@ -592,7 +591,7 @@ class LocationImageService {
         final cityImageNames = _cityImages[selectedCity]!;
         final selectedCityImage = cityImageNames[Random().nextInt(cityImageNames.length)];
         final imagePath = _buildImagePath(selectedCityImage, weather, latitude: latitude, longitude: longitude);
-        print('✅ [2b] Same country random city: $imagePath');
+        Logger.debug('✅ [2b] Same country random city: $imagePath');
         return imagePath;
       }
     }
@@ -607,7 +606,7 @@ class LocationImageService {
       }
       
       final imagePath = _buildRegionalImagePath(regionName, weather);
-      print('✅ [3] Region fallback: $imagePath');
+      Logger.debug('✅ [3] Region fallback: $imagePath');
       return imagePath;
     }
     
@@ -615,7 +614,7 @@ class LocationImageService {
     if (latitude != null && longitude != null) {
       final nearestRegion = _findNearestRegion(latitude, longitude);
       final imagePath = _buildRegionalImagePath(nearestRegion, weather);
-      print('⚡ [4] Final nearest region fallback: $imagePath');
+      Logger.debug('⚡ [4] Final nearest region fallback: $imagePath');
       return imagePath;
     } else {
       // 좌표가 없을 때만 랜덤 도시 선택
@@ -624,7 +623,7 @@ class LocationImageService {
       final cityImageNames = _cityImages[randomCity]!;
       final selectedCityImage = cityImageNames[Random().nextInt(cityImageNames.length)];
       final imagePath = _buildImagePath(selectedCityImage, weather, latitude: latitude, longitude: longitude);
-      print('⚡ [4] Final random fallback: $imagePath');
+      Logger.debug('⚡ [4] Final random fallback: $imagePath');
       return imagePath;
     }
   }
@@ -658,31 +657,31 @@ class LocationImageService {
     if (_isClearOrCloudyWeather(description)) {
       final now = DateTime.now().toUtc(); // UTC로 변환해서 비교
       
-      print('🌤️  Weather condition: "$weatherDescription" (${_isClearOrCloudyWeather(description) ? "sunset 적용 대상" : "sunset 제외"})');
+      Logger.weather('Weather condition: "$weatherDescription" (${_isClearOrCloudyWeather(description) ? "sunset 적용 대상" : "sunset 제외"})');
       
       if (sunrise != null && sunset != null) {
-        print('🌅 API Data - Sunrise: ${sunrise.toLocal()}, Sunset: ${sunset.toLocal()}');
-        print('🌅 UTC Time - Sunrise: $sunrise, Sunset: $sunset, Now: $now');
+        Logger.weather('API Data - Sunrise: ${sunrise.toLocal()}, Sunset: ${sunset.toLocal()}');
+        Logger.weather('UTC Time - Sunrise: $sunrise, Sunset: $sunset, Now: $now');
         // 실제 일출/일몰 시간 기반 처리
         if (_isBetweenSunsetAndSunrise(now, sunrise, sunset)) {
-          print('🌆 Sunset time detected! (API 기반)');
+          Logger.weather('🌆 Sunset time detected! (API 기반)');
           return 'sunset';
         } else {
-          print('☀️ Daytime detected (API 기반)');
+          Logger.weather('☀️ Daytime detected (API 기반)');
         }
       } else {
-        print('⏰ No sunrise/sunset data from API, using default time ranges');
+        Logger.weather('No sunrise/sunset data from API, using default time ranges');
         // 일출/일몰 데이터가 없는 경우 기본 시간대 사용 (UTC 기준)
         final hour = now.hour;
         if ((hour >= 17 && hour <= 19) || (hour >= 5 && hour <= 7)) {
-          print('🌆 Default sunset time detected! (UTC ${hour}시)');
+          Logger.weather('🌆 Default sunset time detected! (UTC $hour시)');
           return 'sunset';
         } else {
-          print('☀️ Default daytime (UTC ${hour}시)');
+          Logger.weather('☀️ Default daytime (UTC $hour시)');
         }
       }
     } else {
-      print('🌧️  Weather condition: "$weatherDescription" (sunset 로직 제외 - 비/눈/안개)');
+      Logger.weather('Weather condition: "$weatherDescription" (sunset 로직 제외 - 비/눈/안개)');
     }
     
     // sunset이 아닌 경우 일반 날씨 매핑 적용
@@ -709,19 +708,19 @@ class LocationImageService {
     // 일반적인 경우: sunrise < sunset (같은 날 또는 연속된 날)
     // 밤 시간은 sunset 이후부터 다음 sunrise 이전까지
     
-    print('🕐 Time comparison: sunrise=$sunrise, now=$now, sunset=$sunset');
+    Logger.weather('Time comparison: sunrise=$sunrise, now=$now, sunset=$sunset');
     
     if (sunrise.isBefore(sunset)) {
       // 정상적인 경우: 일출이 일몰보다 이전 (같은 날)
       // 밤 시간: now < sunrise OR now > sunset
       final isNight = now.isBefore(sunrise) || now.isAfter(sunset);
-      print('🕐 Normal case - isNight: $isNight');
+      Logger.weather('Normal case - isNight: $isNight');
       return isNight;
     } else {
       // 특수한 경우: 일출이 일몰보다 이후 (날짜를 넘나드는 경우)
       // 낮 시간: sunrise < now < sunset
       final isDay = now.isAfter(sunrise) && now.isBefore(sunset);
-      print('🕐 Cross-date case - isNight: ${!isDay}');
+      Logger.weather('Cross-date case - isNight: ${!isDay}');
       return !isDay;
     }
   }
@@ -904,8 +903,8 @@ class LocationImageService {
   /// ## 사용 예시
   /// ```dart
   /// final cities = LocationImageService.getAllSupportedCities();
-  /// print('지원 도시 수: ${cities.length}'); // 83
-  /// print('첫 번째 도시: ${cities.first}');
+  /// Logger.debug(지원 도시 수: ${cities.length}'); // 83
+  /// Logger.debug(첫 번째 도시: ${cities.first}');
   /// ```
   /// 
   /// ## 활용 방안
@@ -972,7 +971,7 @@ class LocationImageService {
     
     // 1. 도시명으로 남부 중국 판단
     if (_southernChinaCities.contains(cityKey)) {
-      print('🇨🇳 Southern China city detected: $cityName');
+      Logger.debug('🇨🇳 Southern China city detected: $cityName');
       return 'southern_china';
     }
     
@@ -980,13 +979,13 @@ class LocationImageService {
     if (latitude != null) {
       // 남부 중국: 위도 26도 이남 (광둥, 광시, 하이난, 푸젠 남부, 후난 남부 등)
       if (latitude < 26.0) {
-        print('🇨🇳 Southern China by latitude: $latitude');
+        Logger.debug('🇨🇳 Southern China by latitude: $latitude');
         return 'southern_china';
       }
     }
     
     // 3. 기본값: 중국 내륙
-    print('🇨🇳 China inland fallback for: $cityName');
+    Logger.debug('🇨🇳 China inland fallback for: $cityName');
     return 'china_inland';
   }
 
@@ -1019,7 +1018,7 @@ class LocationImageService {
       }
     }
     
-    print('📍 Nearest region: $nearestRegion (${minDistance.toStringAsFixed(1)}km away)');
+    Logger.debug('📍 Nearest region: $nearestRegion (${minDistance.toStringAsFixed(1)}km away)');
     return nearestRegion;
   }
 
@@ -1042,7 +1041,7 @@ class LocationImageService {
       }
     }
     
-    print('📍 Nearest city: $nearestCity (${minDistance.toStringAsFixed(1)}km away)');
+    Logger.debug('📍 Nearest city: $nearestCity (${minDistance.toStringAsFixed(1)}km away)');
     return nearestCity;
   }
 }

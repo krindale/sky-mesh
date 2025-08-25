@@ -20,16 +20,14 @@ class LowPolyTheme {
       secondary: LowPolyColors.primaryTeal,
       tertiary: LowPolyColors.primaryIndigo,
       surface: LowPolyColors.surfaceLight,
-      background: LowPolyColors.surfaceLight,
       error: LowPolyColors.errorRed,
       onPrimary: LowPolyColors.textOnDark,
       onSecondary: LowPolyColors.textOnDark,
       onTertiary: LowPolyColors.textOnDark,
       onSurface: LowPolyColors.textPrimary,
-      onBackground: LowPolyColors.textPrimary,
       onError: LowPolyColors.textOnDark,
       outline: LowPolyColors.surfaceMedium,
-      surfaceVariant: LowPolyColors.surfaceMedium,
+      surfaceContainerHighest: LowPolyColors.surfaceMedium,
       onSurfaceVariant: LowPolyColors.textSecondary,
     ),
     
@@ -87,13 +85,13 @@ class LowPolyTheme {
     
     // Checkbox Theme
     checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return LowPolyColors.primaryBlue;
         }
         return LowPolyColors.surfaceMedium;
       }),
-      checkColor: MaterialStateProperty.all(LowPolyColors.textOnDark),
+      checkColor: WidgetStateProperty.all(LowPolyColors.textOnDark),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
       ),
@@ -101,8 +99,8 @@ class LowPolyTheme {
     
     // Radio Theme
     radioTheme: RadioThemeData(
-      fillColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return LowPolyColors.primaryBlue;
         }
         return LowPolyColors.surfaceMedium;
@@ -111,17 +109,17 @@ class LowPolyTheme {
     
     // Switch Theme
     switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return LowPolyColors.primaryBlue;
         }
         return LowPolyColors.surfaceMedium;
       }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
-          return LowPolyColors.primaryBlue.withOpacity(0.5);
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return LowPolyColors.primaryBlue.withValues(alpha: 0.5);
         }
-        return LowPolyColors.surfaceMedium.withOpacity(0.5);
+        return LowPolyColors.surfaceMedium.withValues(alpha: 0.5);
       }),
     ),
     
@@ -171,20 +169,20 @@ class LowPolyTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: LowPolyComponents.primaryButton.copyWith(
-        backgroundColor: MaterialStateProperty.all(LowPolyColors.primaryIndigo),
+        backgroundColor: WidgetStateProperty.all(LowPolyColors.primaryIndigo),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: LowPolyComponents.secondaryButton.copyWith(
-        foregroundColor: MaterialStateProperty.all(LowPolyColors.primaryTeal),
-        side: MaterialStateProperty.all(
+        foregroundColor: WidgetStateProperty.all(LowPolyColors.primaryTeal),
+        side: WidgetStateProperty.all(
           const BorderSide(color: LowPolyColors.primaryTeal, width: 2),
         ),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: LowPolyComponents.tertiaryButton.copyWith(
-        foregroundColor: MaterialStateProperty.all(LowPolyColors.primaryTeal),
+        foregroundColor: WidgetStateProperty.all(LowPolyColors.primaryTeal),
       ),
     ),
     inputDecorationTheme: LowPolyComponents.primaryInputDecoration.copyWith(
@@ -249,7 +247,7 @@ class LowPolyTheme {
         secondary: colors[1],
       ),
       appBarTheme: baseTheme.appBarTheme.copyWith(
-        backgroundColor: colors[0].withOpacity(0.1),
+        backgroundColor: colors[0].withValues(alpha: 0.1),
       ),
     );
   }

@@ -2,7 +2,7 @@ import '../interfaces/weather_repository.dart';
 import '../models/weather_data.dart';
 import '../models/hourly_weather_data.dart';
 import '../models/weekly_weather_data.dart';
-import '../../data/services/openweather_api_service.dart';
+import '../utils/logger.dart';
 
 /// Test to verify LSP (Liskov Substitution Principle)
 /// All implementations of WeatherRepository should be substitutable
@@ -12,56 +12,55 @@ class WeatherRepositoryLspTest {
     // Test 1: getCurrentWeather should return WeatherData
     try {
       final weather = await repository.getCurrentWeather();
-      assert(weather is WeatherData, 'getCurrentWeather must return WeatherData');
+      assert(weather.temperature.isFinite, 'Temperature must be a valid number');
       assert(weather.cityName.isNotEmpty, 'City name must not be empty');
       assert(weather.country.isNotEmpty, 'Country must not be empty');
-      print('✅ getCurrentWeather contract verified');
+      Logger.debug('✅ getCurrentWeather contract verified');
     } catch (e) {
-      print('❌ getCurrentWeather contract violated: $e');
+      Logger.debug('❌ getCurrentWeather contract violated: $e');
     }
 
     // Test 2: getWeatherByCoordinates should handle valid coordinates
     try {
       final weather = await repository.getWeatherByCoordinates(37.5665, 126.9780);
-      assert(weather is WeatherData, 'getWeatherByCoordinates must return WeatherData');
-      print('✅ getWeatherByCoordinates contract verified');
+      assert(weather.temperature.isFinite, 'Temperature must be a valid number');
+      Logger.debug('✅ getWeatherByCoordinates contract verified');
     } catch (e) {
-      print('❌ getWeatherByCoordinates contract violated: $e');
+      Logger.debug('❌ getWeatherByCoordinates contract violated: $e');
     }
 
     // Test 3: getHourlyWeather should return hourly forecasts
     try {
       final hourlyWeather = await repository.getHourlyWeather();
-      assert(hourlyWeather is HourlyWeatherData, 'getHourlyWeather must return HourlyWeatherData');
       assert(hourlyWeather.hourlyForecasts.isNotEmpty, 'Hourly forecasts must not be empty');
-      print('✅ getHourlyWeather contract verified');
+      Logger.debug('✅ getHourlyWeather contract verified');
     } catch (e) {
-      print('❌ getHourlyWeather contract violated: $e');
+      Logger.debug('❌ getHourlyWeather contract violated: $e');
     }
 
     // Test 4: getWeeklyWeather should return weekly forecasts
     try {
       final weeklyWeather = await repository.getWeeklyWeather();
-      assert(weeklyWeather is WeeklyWeatherData, 'getWeeklyWeather must return WeeklyWeatherData');
+      assert(weeklyWeather.dailyForecasts.length >= 7, 'Weekly forecast should have at least 7 days');
       assert(weeklyWeather.dailyForecasts.isNotEmpty, 'Daily forecasts must not be empty');
-      print('✅ getWeeklyWeather contract verified');
+      Logger.debug('✅ getWeeklyWeather contract verified');
     } catch (e) {
-      print('❌ getWeeklyWeather contract violated: $e');
+      Logger.debug('❌ getWeeklyWeather contract violated: $e');
     }
 
     // Test 5: getRandomCityWeather should return valid weather data
     try {
       final randomWeather = await repository.getRandomCityWeather();
-      assert(randomWeather is WeatherData, 'getRandomCityWeather must return WeatherData');
-      print('✅ getRandomCityWeather contract verified');
+      assert(randomWeather.cityName.isNotEmpty, 'Random weather must have city name');
+      Logger.debug('✅ getRandomCityWeather contract verified');
     } catch (e) {
-      print('❌ getRandomCityWeather contract violated: $e');
+      Logger.debug('❌ getRandomCityWeather contract violated: $e');
     }
   }
 
   /// Verify that substitution works correctly
   static Future<void> verifySubstitutability() async {
-    print('🧪 Testing LSP - Liskov Substitution Principle');
+    Logger.debug('🧪 Testing LSP - Liskov Substitution Principle');
     
     // Test with different implementations
     final repositories = <WeatherRepository>[
@@ -71,11 +70,11 @@ class WeatherRepositoryLspTest {
     ];
 
     for (int i = 0; i < repositories.length; i++) {
-      print('\n📋 Testing repository implementation ${i + 1}:');
+      Logger.debug('\n📋 Testing repository implementation ${i + 1}:');
       await testWeatherRepositoryContract(repositories[i]);
     }
 
-    print('\n✅ LSP verification completed');
+    Logger.debug('\n✅ LSP verification completed');
   }
 }
 

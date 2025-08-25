@@ -7,6 +7,7 @@ import '../../core/interfaces/location_service.dart';
 import '../../core/models/weather_data.dart';
 import '../../core/models/hourly_weather_data.dart';
 import '../../core/models/weekly_weather_data.dart';
+import '../../core/utils/logger.dart';
 
 /// Concrete implementation of WeatherRepository using OpenWeatherMap API
 /// 
@@ -94,7 +95,7 @@ class OpenWeatherApiService implements
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error loading weather by coordinates: $e');
+      Logger.debug('Error loading weather by coordinates: $e');
       return _weatherDataFactory.createMockWeatherData();
     }
   }
@@ -106,7 +107,7 @@ class OpenWeatherApiService implements
       final latitude = randomCity['latitude'] as double;
       final longitude = randomCity['longitude'] as double;
       
-      print('🎲 Random city selected: ${randomCity['name']}, ${randomCity['country']} ($latitude, $longitude)');
+      Logger.debug('🎲 Random city selected: ${randomCity['name']}, ${randomCity['country']} ($latitude, $longitude)');
       
       final response = await http.get(
         Uri.parse('$_baseUrl?lat=$latitude&lon=$longitude&appid=$_apiKey&units=metric'),
@@ -119,7 +120,7 @@ class OpenWeatherApiService implements
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error loading random city weather: $e');
+      Logger.debug('Error loading random city weather: $e');
       return _weatherDataFactory.createRandomMockWeatherData();
     }
   }
@@ -130,7 +131,7 @@ class OpenWeatherApiService implements
       final position = await _locationService.getCurrentLocation();
       return await getHourlyWeatherByCoordinates(position.latitude, position.longitude);
     } catch (e) {
-      print('Error loading hourly weather: $e');
+      Logger.debug('Error loading hourly weather: $e');
       return _weatherDataFactory.createMockHourlyWeatherData();
     }
   }
@@ -149,7 +150,7 @@ class OpenWeatherApiService implements
         throw Exception('Failed to load hourly weather data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error loading hourly weather by coordinates: $e');
+      Logger.debug('Error loading hourly weather by coordinates: $e');
       return _weatherDataFactory.createMockHourlyWeatherData();
     }
   }
@@ -160,7 +161,7 @@ class OpenWeatherApiService implements
       final position = await _locationService.getCurrentLocation();
       return await getWeeklyWeatherByCoordinates(position.latitude, position.longitude);
     } catch (e) {
-      print('Error loading weekly weather: $e');
+      Logger.debug('Error loading weekly weather: $e');
       return _weatherDataFactory.createMockWeeklyWeatherData();
     }
   }
@@ -179,7 +180,7 @@ class OpenWeatherApiService implements
         throw Exception('Failed to load weekly weather data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error loading weekly weather by coordinates: $e');
+      Logger.debug('Error loading weekly weather by coordinates: $e');
       return _weatherDataFactory.createMockWeeklyWeatherData();
     }
   }
@@ -353,7 +354,7 @@ class WeatherDataFactory {
 /// ```dart
 /// // Get a random city
 /// final city = RandomCityProvider.getRandomCity();
-/// print('${city['name']}, ${city['country']}'); // "Tokyo, JP"
+/// Logger.debug(${city['name']}, ${city['country']}'); // "Tokyo, JP"
 /// 
 /// // Get all available cities
 /// final allCities = RandomCityProvider.getAllCities();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sky_mesh/widgets/weather_display_widget.dart';
-import 'package:sky_mesh/services/weather_service.dart';
+import 'package:sky_mesh/core/models/weather_data.dart';
 
 void main() {
   group('WeatherDisplayWidget Tests', () {
@@ -17,6 +17,7 @@ void main() {
       pressure: 1013,
       visibility: 10000,
       uvIndex: 5,
+      airQuality: 2,
       latitude: 37.5665,
       longitude: 126.9780,
     );
@@ -195,6 +196,7 @@ void main() {
           pressure: 1013,
           visibility: 10000,
           uvIndex: uvIndex,
+          airQuality: 2,
         );
 
         await tester.pumpWidget(
@@ -298,6 +300,7 @@ void main() {
         pressure: 1013,
         visibility: 12500,
         uvIndex: 7,
+        airQuality: 3,
       );
 
       expect(weatherData.temperatureString, '23°');

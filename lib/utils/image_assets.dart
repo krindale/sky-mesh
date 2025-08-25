@@ -247,7 +247,7 @@ class ImageAssets {
     regionCities.forEach((region, cities) {
       for (String city in cities) {
         for (String weather in weatherTypes) {
-          allPaths.add('$_baseLocationPath/regions/$region/${city}_$weather.png');
+          allPaths.add('$_baseLocationPath/regions/$region/${city}_$weather.webp');
         }
       }
     });
@@ -255,7 +255,7 @@ class ImageAssets {
     // 지역별 fallback 이미지들 추가
     for (String region in regionalFallbacks) {
       for (String weather in weatherTypes) {
-        allPaths.add('$_baseLocationPath/regional_fallback/$region/${region}_$weather.png');
+        allPaths.add('$_baseLocationPath/regional_fallback/$region/${region}_$weather.webp');
       }
     }
     
@@ -280,13 +280,13 @@ class ImageAssets {
     // 지역별 도시 이미지들에서 해당 날씨 찾기
     regionCities.forEach((region, cities) {
       for (String city in cities) {
-        weatherPaths.add('$_baseLocationPath/regions/$region/${city}_$weather.png');
+        weatherPaths.add('$_baseLocationPath/regions/$region/${city}_$weather.webp');
       }
     });
     
     // 지역별 fallback 이미지들에서 해당 날씨 찾기
     for (String region in regionalFallbacks) {
-      weatherPaths.add('$_baseLocationPath/regional_fallback/$region/${region}_$weather.png');
+      weatherPaths.add('$_baseLocationPath/regional_fallback/$region/${region}_$weather.webp');
     }
     
     final random = Random();
@@ -302,7 +302,7 @@ class ImageAssets {
     // 지역별로 도시 찾기
     for (MapEntry<String, List<String>> entry in regionCities.entries) {
       if (entry.value.contains(city)) {
-        return '$_baseLocationPath/regions/${entry.key}/${city}_$weather.png';
+        return '$_baseLocationPath/regions/${entry.key}/${city}_$weather.webp';
       }
     }
     
@@ -315,6 +315,6 @@ class ImageAssets {
       return null;
     }
     
-    return '$_baseLocationPath/regional_fallback/$region/${region}_$weather.png';
+    return '$_baseLocationPath/regional_fallback/$region/${region}_$weather.webp';
   }
 }

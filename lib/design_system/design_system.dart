@@ -69,7 +69,6 @@
 /// - **대조적 색상**: 날씨 조건을 반영한 명확한 색상 구분
 /// - **최소주의**: 불필요한 장식 요소 제거, 핵심 기능에 집중
 
-library design_system;
 
 // Core design tokens
 export 'colors.dart';

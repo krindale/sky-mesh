@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'colors.dart';
 
 /// Low Poly Shadow System
 /// Geometric shadows that enhance the faceted design
 /// with angular light sources and dramatic depth
 class LowPolyShadows {
-  // Base shadow color with opacity variations
-  static const Color _shadowColor = LowPolyColors.surfaceDeep;
   
   // Elevation-based shadows (Material Design inspired)
   static const List<BoxShadow> elevation1 = [
@@ -256,7 +253,7 @@ class LowPolyShadows {
   // Utility methods
   static List<BoxShadow> withOpacity(List<BoxShadow> shadows, double opacity) {
     return shadows.map((shadow) => shadow.copyWith(
-      color: shadow.color.withOpacity(shadow.color.opacity * opacity),
+      color: shadow.color.withValues(alpha: shadow.color.a * opacity),
     )).toList();
   }
   

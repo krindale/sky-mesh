@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sky_mesh/services/weather_service.dart';
+import 'package:sky_mesh/core/models/weather_data.dart';
 
 void main() {
   group('WeatherService Tests', () {
@@ -99,6 +100,7 @@ void main() {
         pressure: 1013,
         visibility: 10000,
         uvIndex: 5,
+        airQuality: 2,
         latitude: 37.5665,
         longitude: 126.9780,
       );
@@ -176,6 +178,7 @@ void main() {
         pressure: 1008,
         visibility: 12500,
         uvIndex: 7,
+        airQuality: 3,
       );
 
       expect(weatherData.temperatureString, '23°');
@@ -214,6 +217,7 @@ void main() {
           pressure: 1000,
           visibility: 10000,
           uvIndex: 1,
+          airQuality: 1,
         );
 
         expect(weatherData.capitalizedDescription, expected);
@@ -265,6 +269,7 @@ void main() {
         pressure: 0,
         visibility: 0,
         uvIndex: 0,
+        airQuality: 1,
       );
 
       expect(weatherData.temperatureString, '0°');

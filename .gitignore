@@ -62,3 +62,5 @@ windows/flutter/generated_plugin_registrant.cc
 windows/flutter/generated_plugins.cmake
 nul
 macos/Flutter/GeneratedPluginRegistrant.swift
+additional_develop
+additional_cities.txt

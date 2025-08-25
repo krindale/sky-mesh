@@ -120,7 +120,7 @@ class BackgroundImageWithOverlay extends StatelessWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: overlayColor.withOpacity(overlayOpacity),
+          color: overlayColor.withValues(alpha: overlayOpacity),
         ),
         child: child,
       ),

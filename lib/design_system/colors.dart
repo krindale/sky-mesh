@@ -296,11 +296,9 @@ class LowPolyColors {
     primary: sunnyYellow,           // 주요 UI 요소 - 밝은 태양색
     secondary: accentOrange,        // 보조 요소 - 따뜻한 오렌지
     surface: surfaceLight,          // 카드/패널 - 밝은 표면
-    background: Color(0xFFFEFCE8),  // 앱 배경 - 연한 크림색 (#FEFCE8)
     onPrimary: textPrimary,         // 주요 색상 위 텍스트 - 어두운 텍스트
     onSecondary: textOnDark,        // 보조 색상 위 텍스트 - 밝은 텍스트
     onSurface: textPrimary,         // 표면 위 텍스트 - 어두운 텍스트
-    onBackground: textPrimary,      // 배경 위 텍스트 - 어두운 텍스트
   );
   
   /// 흐린 날 색상 스킴 - 차분하고 중성적인 라이트 모드 테마
@@ -310,11 +308,9 @@ class LowPolyColors {
     primary: cloudyGray,            // 주요 UI 요소 - 차분한 회색
     secondary: primaryBlue,         // 보조 요소 - 하늘 파랑
     surface: surfaceMedium,         // 카드/패널 - 중간 톤 표면
-    background: Color(0xFFF1F5F9),  // 앱 배경 - 연한 블루그레이 (#F1F5F9)
     onPrimary: textOnDark,          // 주요 색상 위 텍스트 - 밝은 텍스트
     onSecondary: textOnDark,        // 보조 색상 위 텍스트 - 밝은 텍스트
     onSurface: textPrimary,         // 표면 위 텍스트 - 어두운 텍스트
-    onBackground: textPrimary,      // 배경 위 텍스트 - 어두운 텍스트
   );
   
   /// 밤 색상 스킴 - 깊이 있고 신비로운 다크 모드 테마
@@ -324,11 +320,9 @@ class LowPolyColors {
     primary: primaryIndigo,         // 주요 UI 요소 - 깊은 인디고
     secondary: accentPurple,        // 보조 요소 - 황혼 퍼플
     surface: surfaceDark,           // 카드/패널 - 어두운 표면
-    background: surfaceDeep,        // 앱 배경 - 깊은 계곡색
     onPrimary: textOnDark,          // 주요 색상 위 텍스트 - 밝은 텍스트
     onSecondary: textOnDark,        // 보조 색상 위 텍스트 - 밝은 텍스트
     onSurface: textOnDark,          // 표면 위 텍스트 - 밝은 텍스트
-    onBackground: textOnDark,       // 배경 위 텍스트 - 밝은 텍스트
   );
   
   // ====================================================================
@@ -364,7 +358,7 @@ class LowPolyColors {
   /// - 0.3-0.5: 오버레이, 비활성 상태
   /// - 0.7-0.9: 반투명 카드, 모달 배경
   static Color withOpacity(Color color, double opacity) {
-    return color.withOpacity(opacity);
+    return color.withValues(alpha: opacity);
   }
   
   /// 날씨 조건별 색상 배열 반환
