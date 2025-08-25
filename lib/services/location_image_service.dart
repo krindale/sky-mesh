@@ -42,6 +42,8 @@
 
 import 'dart:math';  // 랜덤 숫자 생성을 위한 수학 라이브러리
 
+import '../utils/image_assets.dart';  // ImageAssets 클래스 import
+
 /// 위치와 날씨에 따른 이미지 선택 서비스
 /// 
 /// 이 클래스는 468개의 로우폴리 배경 이미지 매핑을 관리하며,
@@ -69,6 +71,11 @@ class LocationImageService {
     'mumbai': ['mumbai'],
     'shanghai': ['shanghai'],
     'taipei': ['taipei'],
+    'sapporo': ['sapporo'],
+    'bali': ['bali'],
+    'phuket': ['phuket'],
+    'angkor_wat': ['angkor_wat'],
+    'maldives': ['maldives'],
     
     // 베이징 하위 구들
     'dongcheng': ['beijing'],    // 동성구
@@ -125,6 +132,7 @@ class LocationImageService {
     'tehran': ['tehran'],
     'riyadh': ['riyadh'],
     'tel_aviv': ['tel_aviv'],
+    'petra': ['petra'],
     
     // 유럽
     'paris': ['paris'],
@@ -139,6 +147,9 @@ class LocationImageService {
     'zurich': ['zurich'],
     'moscow': ['moscow'],
     'istanbul': ['istanbul'],
+    'dubrovnik': ['dubrovnik'],
+    'zermatt': ['zermatt'],
+    'santorini': ['santorini'],
     
     // 북미
     'new_york': ['new_york'],
@@ -152,12 +163,15 @@ class LocationImageService {
     'toronto': ['toronto'],
     'vancouver': ['vancouver'],
     'mexico_city': ['mexico_city'],
+    'cancun': ['cancun'],
+    'aspen': ['aspen'],
     
     // 남미  
     'buenos_aires': ['buenos_aires'],
     'rio_de_janeiro': ['rio_de_janeiro'],
     'santiago': ['santiago'],
     'sao_paulo': ['sao_paulo'],
+    'machu_picchu': ['machu_picchu'],
     
     // 아프리카
     'cairo': ['cairo'],
@@ -169,6 +183,9 @@ class LocationImageService {
     // 오세아니아
     'sydney': ['sydney'],
     'melbourne': ['melbourne'],
+    'hawaii': ['hawaii'],
+    'tahiti': ['tahiti'],
+    'queenstown': ['queenstown'],
   };
 
   // 도시별 위도/경도 정보 (거리 계산용)
@@ -187,12 +204,18 @@ class LocationImageService {
     'mumbai': [19.0760, 72.8777],
     'shanghai': [31.2304, 121.4737],
     'taipei': [25.0330, 121.5654],
+    'sapporo': [43.0642, 141.3469],
+    'bali': [-8.3405, 115.0920],
+    'phuket': [7.8804, 98.3923],
+    'angkor_wat': [13.4125, 103.8670],
+    'maldives': [3.2028, 73.2207],
     
     // 중동
     'dubai': [25.2048, 55.2708],
     'tehran': [35.6892, 51.3890],
     'riyadh': [24.7136, 46.6753],
     'tel_aviv': [32.0853, 34.7818],
+    'petra': [30.3285, 35.4444],
     
     // 유럽
     'paris': [48.8566, 2.3522],
@@ -207,6 +230,9 @@ class LocationImageService {
     'zurich': [47.3769, 8.5417],
     'moscow': [55.7558, 37.6176],
     'istanbul': [41.0082, 28.9784],
+    'dubrovnik': [42.6507, 18.0944],
+    'zermatt': [46.0207, 7.7491],
+    'santorini': [36.3932, 25.4615],
     
     // 북미
     'new_york': [40.7128, -74.0060],
@@ -220,12 +246,15 @@ class LocationImageService {
     'toronto': [43.6532, -79.3832],
     'vancouver': [49.2827, -123.1207],
     'mexico_city': [19.4326, -99.1332],
+    'cancun': [21.1619, -86.8515],
+    'aspen': [39.1911, -106.8175],
     
     // 남미
     'buenos_aires': [-34.6118, -58.3960],
     'rio_de_janeiro': [-22.9068, -43.1729],
     'santiago': [-33.4489, -70.6693],
     'sao_paulo': [-23.5505, -46.6333],
+    'machu_picchu': [-13.1631, -72.5450],
     
     // 아프리카
     'cairo': [30.0444, 31.2357],
@@ -237,6 +266,9 @@ class LocationImageService {
     // 오세아니아
     'sydney': [-33.8688, 151.2093],
     'melbourne': [-37.8136, 144.9631],
+    'hawaii': [21.3099, -157.8581],
+    'tahiti': [-17.6797, -149.4068],
+    'queenstown': [-45.0312, 168.6626],
   };
 
   // 국가별 도시 매핑 (우선순위 2)
@@ -244,22 +276,25 @@ class LocationImageService {
     // 아시아
     'KR': ['seoul'], 
     'KP': ['seoul'],  // 북한
-    'JP': ['tokyo'],
+    'JP': ['tokyo', 'sapporo'],
     'CN': ['beijing', 'shanghai'],
-    'TH': ['bangkok'],
+    'TH': ['bangkok', 'phuket'],
     'SG': ['singapore'],
     'PH': ['manila'],
-    'ID': ['jakarta'],
+    'ID': ['jakarta', 'bali'],
     'MY': ['kuala_lumpur'],
     'VN': ['ho_chi_minh'],
     'IN': ['bangalore', 'mumbai'],
     'TW': ['taipei'],
+    'KH': ['angkor_wat'],  // 캄보디아
+    'MV': ['maldives'],    // 몰디브
     
     // 중동
     'AE': ['dubai'],
     'IR': ['tehran'],
     'SA': ['riyadh'],
     'IL': ['tel_aviv'],
+    'JO': ['petra'],       // 요단
     
     // 유럽
     'FR': ['paris'],
@@ -271,19 +306,22 @@ class LocationImageService {
     'CZ': ['prague'],
     'SE': ['stockholm'],
     'AT': ['vienna'],
-    'CH': ['zurich'],
+    'CH': ['zurich', 'zermatt'],  // 스위스
     'RU': ['moscow'],
     'TR': ['istanbul'],
+    'HR': ['dubrovnik'],   // 크로아티아
+    'GR': ['santorini'],   // 그리스
     
     // 북미
-    'US': ['san_francisco', 'los_angeles', 'seattle', 'new_york', 'chicago', 'boston', 'miami', 'washington_dc'],
+    'US': ['san_francisco', 'los_angeles', 'seattle', 'new_york', 'chicago', 'boston', 'miami', 'washington_dc', 'aspen', 'hawaii'],
     'CA': ['toronto', 'vancouver'],
-    'MX': ['mexico_city'],
+    'MX': ['mexico_city', 'cancun'],
     
     // 남미
     'AR': ['buenos_aires'],
     'BR': ['rio_de_janeiro', 'sao_paulo'],
     'CL': ['santiago'],
+    'PE': ['machu_picchu'],  // 페루
     
     // 아프리카
     'EG': ['cairo'],
@@ -294,6 +332,8 @@ class LocationImageService {
     
     // 오세아니아
     'AU': ['sydney', 'melbourne'],
+    'PF': ['tahiti'],      // 타히티 (프랑스령 폴리네시아)
+    'NZ': ['queenstown'],  // 뉴질랜드
   };
 
   // 중국 남부 지역 도시들 (광둥, 광시, 하이난, 푸젠, 홍콩, 마카오 등)
@@ -322,7 +362,6 @@ class LocationImageService {
     
     // 동남아시아 (지원 도시 없는 국가들)
     'LA': 'southeast_asia_extended', // 라오스
-    'KH': 'southeast_asia_extended', // 캄보디아
     'MM': 'southeast_asia_extended', // 미얀마
     'BN': 'southeast_asia_extended', // 브루나이
     'TL': 'southeast_asia_extended', // 동티모르
@@ -332,7 +371,6 @@ class LocationImageService {
     'KW': 'middle_east',     // 쿠웨이트
     'BH': 'middle_east',     // 바레인
     'OM': 'middle_east',     // 오만
-    'JO': 'middle_east',     // 요단
     'LB': 'middle_east',     // 레바논
     'SY': 'middle_east',     // 시리아
     'IQ': 'middle_east',     // 이라크
@@ -376,6 +414,11 @@ class LocationImageService {
     'CM': 'west_africa',     // 카메룬
     'CG': 'west_africa',     // 콩고공화국
     'CD': 'west_africa',     // 콩고민주공화국
+    'AO': 'west_africa',     // 앙골라
+    'MZ': 'east_africa',     // 모잠비크
+    'ZM': 'east_africa',     // 잠비아
+    'MW': 'east_africa',     // 말라위
+    'MG': 'east_africa',     // 마다가스카르
     
     // 유럽 (지원 도시 없는 국가들)
     'PL': 'eastern_europe',  // 폴란드
@@ -384,7 +427,6 @@ class LocationImageService {
     'RO': 'eastern_europe',  // 루마니아
     'BG': 'eastern_europe',  // 불가리아
     'SI': 'eastern_europe',  // 슬로베니아
-    'HR': 'eastern_europe',  // 크로아티아
     'BA': 'eastern_europe',  // 보스니아헤르체고비나
     'RS': 'eastern_europe',  // 세르비아
     'ME': 'eastern_europe',  // 몬테네그로
@@ -402,14 +444,12 @@ class LocationImageService {
     'DK': 'eastern_europe',  // 덴마크
     'FI': 'eastern_europe',  // 핀란드
     'IS': 'eastern_europe',  // 아이슬란드
-    'GR': 'eastern_europe',  // 그리스
     'BE': 'eastern_europe',  // 벨기에
     'IE': 'eastern_europe',  // 아일랜드
     'PT': 'eastern_europe',  // 포르투갈
     
     // 남미 (지원 도시 없는 국가들)
     'CO': 'northern_andes',  // 콜롬비아
-    'PE': 'northern_andes',  // 페루
     'EC': 'northern_andes',  // 에콰도르
     'VE': 'northern_andes',  // 베네수엘라
     'BO': 'northern_andes',  // 볼리비아
@@ -422,7 +462,6 @@ class LocationImageService {
     'NI': 'northern_andes',  // 니카라과
     
     // 오세아니아 (지원 도시 없는 국가들)
-    'NZ': 'oceania_extended', // 뉴질랜드
     'FJ': 'oceania_extended', // 피지
     'PG': 'oceania_extended', // 파푸아뉴기니
     'VU': 'oceania_extended', // 바누아투
@@ -570,14 +609,22 @@ class LocationImageService {
       return imagePath;
     }
     
-    // 우선순위 4: 최종 랜덤 폴백
-    final allCities = _cityImages.keys.toList();
-    final randomCity = allCities[Random().nextInt(allCities.length)];
-    final cityImageNames = _cityImages[randomCity]!;
-    final selectedCityImage = cityImageNames[Random().nextInt(cityImageNames.length)];
-    final imagePath = _buildImagePath(selectedCityImage, weather, latitude: latitude, longitude: longitude);
-    print('⚡ [4] Final random fallback: $imagePath');
-    return imagePath;
+    // 우선순위 4: 최종 폴백 (좌표가 있으면 가장 가까운 지역, 없으면 랜덤)
+    if (latitude != null && longitude != null) {
+      final nearestRegion = _findNearestRegion(latitude, longitude);
+      final imagePath = _buildRegionalImagePath(nearestRegion, weather);
+      print('⚡ [4] Final nearest region fallback: $imagePath');
+      return imagePath;
+    } else {
+      // 좌표가 없을 때만 랜덤 도시 선택
+      final allCities = _cityImages.keys.toList();
+      final randomCity = allCities[Random().nextInt(allCities.length)];
+      final cityImageNames = _cityImages[randomCity]!;
+      final selectedCityImage = cityImageNames[Random().nextInt(cityImageNames.length)];
+      final imagePath = _buildImagePath(selectedCityImage, weather, latitude: latitude, longitude: longitude);
+      print('⚡ [4] Final random fallback: $imagePath');
+      return imagePath;
+    }
   }
 
   /// 날씨 설명을 6가지 이미지 타입으로 매핑
@@ -726,8 +773,31 @@ class LocationImageService {
       'lagos': 'africa',
       'shanghai': 'asia',
       'taipei': 'asia',
+      'sapporo': 'asia',
+      'bali': 'asia',
+      'phuket': 'asia',
+      'angkor_wat': 'asia',
+      'maldives': 'asia',
+      
+      // 중동
+      'petra': 'middle_east',
+      
+      // 유럽
+      'dubrovnik': 'europe',
+      'zermatt': 'europe',
+      'santorini': 'europe',
+      
+      // 북미
+      'cancun': 'north_america',
+      'aspen': 'north_america',
+      'hawaii': 'oceania',
+      
+      // 남미
+      'machu_picchu': 'south_america',
       
       // 오세아니아
+      'tahiti': 'oceania',
+      'queenstown': 'oceania',
       'sydney': 'oceania',
       'melbourne': 'oceania',
     };
@@ -764,17 +834,18 @@ class LocationImageService {
     return 'assets/location_images/regional_fallback/${regionName}/${regionName}_${weather}.png';
   }
 
-  /// SkyMesh에서 지원하는 모든 도시 목록 반환
+  /// SkyMesh에서 지원하는 모든 고유 도시 목록 반환
   /// 
-  /// 68개 주요 도시의 목록을 반환합니다. 이 도시들은 각각 6가지 날씨 조건의
+  /// 83개 주요 도시의 목록을 반환합니다. 이 도시들은 각각 6가지 날씨 조건의
   /// 로우폴리 이미지를 보유하고 있습니다.
+  /// 베이징, 상하이의 하위 구들은 제외하고 실제 고유 도시만 포함합니다.
   /// 
   /// @return List<String> 지원 도시 목록
   /// 
   /// ## 사용 예시
   /// ```dart
   /// final cities = LocationImageService.getAllSupportedCities();
-  /// print('지원 도시 수: ${cities.length}'); // 68
+  /// print('지원 도시 수: ${cities.length}'); // 83
   /// print('첫 번째 도시: ${cities.first}');
   /// ```
   /// 
@@ -858,6 +929,39 @@ class LocationImageService {
     // 3. 기본값: 중국 내륙
     print('🇨🇳 China inland fallback for: $cityName');
     return 'china_inland';
+  }
+
+  /// 지역별 대표 좌표 (지역 대체 이미지를 위한 중심점)
+  static const Map<String, List<double>> _regionCoordinates = {
+    'central_asia': [42.0, 64.0],           // 중앙아시아 중심부
+    'china_inland': [35.0, 104.0],          // 중국 내륙 중심부
+    'southern_china': [23.0, 113.0],        // 중국 남부 (광저우 인근)
+    'northern_india': [28.0, 77.0],         // 북인도 (델리 인근)
+    'southeast_asia_extended': [0.0, 110.0], // 동남아시아 확장
+    'eastern_europe': [50.0, 20.0],         // 동유럽 중심부
+    'northern_andes': [0.0, -75.0],         // 북안데스 (에콰도르/콜롬비아)
+    'east_africa': [-5.0, 35.0],           // 동아프리카 (케냐/탄자니아)
+    'west_africa': [10.0, 0.0],            // 서아프리카 (가나/나이지리아)
+    'oceania_extended': [-15.0, 170.0],     // 확장 오세아니아
+  };
+
+  /// 가장 가까운 지역 찾기
+  static String _findNearestRegion(double latitude, double longitude) {
+    String nearestRegion = 'central_asia'; // 기본값
+    double minDistance = double.infinity;
+    
+    for (String region in _regionCoordinates.keys) {
+      List<double> coords = _regionCoordinates[region]!;
+      double distance = _calculateDistance(latitude, longitude, coords[0], coords[1]);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestRegion = region;
+      }
+    }
+    
+    print('📍 Nearest region: $nearestRegion (${minDistance.toStringAsFixed(1)}km away)');
+    return nearestRegion;
   }
 
   /// 가장 가까운 도시 찾기

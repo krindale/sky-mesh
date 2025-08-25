@@ -371,10 +371,21 @@ class RandomCityProvider {
     {'latitude': 10.8231, 'longitude': 106.6297, 'name': 'Ho Chi Minh City', 'country': 'VN'},
     {'latitude': 12.9716, 'longitude': 77.5946, 'name': 'Bangalore', 'country': 'IN'},
     {'latitude': 19.0760, 'longitude': 72.8777, 'name': 'Mumbai', 'country': 'IN'},
+    {'latitude': 31.2304, 'longitude': 121.4737, 'name': 'Shanghai', 'country': 'CN'},
+    {'latitude': 25.0330, 'longitude': 121.5654, 'name': 'Taipei', 'country': 'TW'},
+    
+    // 새로 추가된 아시아 도시들
+    {'latitude': 43.0642, 'longitude': 141.3469, 'name': 'Sapporo', 'country': 'JP'},
+    {'latitude': -8.3405, 'longitude': 115.0920, 'name': 'Bali', 'country': 'ID'},
+    {'latitude': 7.8804, 'longitude': 98.3923, 'name': 'Phuket', 'country': 'TH'},
+    {'latitude': 13.4125, 'longitude': 103.8670, 'name': 'Angkor Wat', 'country': 'KH'},
+    {'latitude': 3.2028, 'longitude': 73.2207, 'name': 'Maldives', 'country': 'MV'},
+    
     {'latitude': 25.2048, 'longitude': 55.2708, 'name': 'Dubai', 'country': 'AE'},
     {'latitude': 35.6892, 'longitude': 51.3890, 'name': 'Tehran', 'country': 'IR'},
     {'latitude': 24.7136, 'longitude': 46.6753, 'name': 'Riyadh', 'country': 'SA'},
     {'latitude': 32.0853, 'longitude': 34.7818, 'name': 'Tel Aviv', 'country': 'IL'},
+    {'latitude': 30.3285, 'longitude': 35.4444, 'name': 'Petra', 'country': 'JO'},
     {'latitude': 48.8566, 'longitude': 2.3522, 'name': 'Paris', 'country': 'FR'},
     {'latitude': 51.5074, 'longitude': -0.1278, 'name': 'London', 'country': 'GB'},
     {'latitude': 52.5200, 'longitude': 13.4050, 'name': 'Berlin', 'country': 'DE'},
@@ -387,6 +398,11 @@ class RandomCityProvider {
     {'latitude': 47.3769, 'longitude': 8.5417, 'name': 'Zurich', 'country': 'CH'},
     {'latitude': 55.7558, 'longitude': 37.6176, 'name': 'Moscow', 'country': 'RU'},
     {'latitude': 41.0082, 'longitude': 28.9784, 'name': 'Istanbul', 'country': 'TR'},
+    
+    // 새로 추가된 유럽 도시들
+    {'latitude': 42.6420, 'longitude': 18.1081, 'name': 'Dubrovnik', 'country': 'HR'},
+    {'latitude': 46.0207, 'longitude': 7.7491, 'name': 'Zermatt', 'country': 'CH'},
+    {'latitude': 36.3932, 'longitude': 25.4615, 'name': 'Santorini', 'country': 'GR'},
     {'latitude': 40.7128, 'longitude': -74.0060, 'name': 'New York', 'country': 'US'},
     {'latitude': 34.0522, 'longitude': -118.2437, 'name': 'Los Angeles', 'country': 'US'},
     {'latitude': 37.7749, 'longitude': -122.4194, 'name': 'San Francisco', 'country': 'US'},
@@ -398,15 +414,27 @@ class RandomCityProvider {
     {'latitude': 43.6532, 'longitude': -79.3832, 'name': 'Toronto', 'country': 'CA'},
     {'latitude': 49.2827, 'longitude': -123.1207, 'name': 'Vancouver', 'country': 'CA'},
     {'latitude': 19.4326, 'longitude': -99.1332, 'name': 'Mexico City', 'country': 'MX'},
+    
+    // 새로 추가된 북미 도시들
+    {'latitude': 21.1619, 'longitude': -86.8515, 'name': 'Cancun', 'country': 'MX'},
+    {'latitude': 39.1911, 'longitude': -106.8175, 'name': 'Aspen', 'country': 'US'},
     {'latitude': -34.6118, 'longitude': -58.3960, 'name': 'Buenos Aires', 'country': 'AR'},
     {'latitude': -22.9068, 'longitude': -43.1729, 'name': 'Rio de Janeiro', 'country': 'BR'},
     {'latitude': -33.4489, 'longitude': -70.6693, 'name': 'Santiago', 'country': 'CL'},
     {'latitude': -23.5505, 'longitude': -46.6333, 'name': 'São Paulo', 'country': 'BR'},
+    
+    // 새로 추가된 남미 도시들
+    {'latitude': -13.1631, 'longitude': -72.5450, 'name': 'Machu Picchu', 'country': 'PE'},
     {'latitude': 30.0444, 'longitude': 31.2357, 'name': 'Cairo', 'country': 'EG'},
     {'latitude': -26.2041, 'longitude': 28.0473, 'name': 'Johannesburg', 'country': 'ZA'},
     {'latitude': -1.2921, 'longitude': 36.8219, 'name': 'Nairobi', 'country': 'KE'},
     {'latitude': 33.5731, 'longitude': -7.5898, 'name': 'Casablanca', 'country': 'MA'},
     {'latitude': -33.8688, 'longitude': 151.2093, 'name': 'Sydney', 'country': 'AU'},
+    
+    // 새로 추가된 오세아니아 도시들
+    {'latitude': 21.3099, 'longitude': -157.8581, 'name': 'Hawaii', 'country': 'US'},
+    {'latitude': -17.6797, 'longitude': -149.4068, 'name': 'Tahiti', 'country': 'PF'},
+    {'latitude': -45.0312, 'longitude': 168.6626, 'name': 'Queenstown', 'country': 'NZ'},
   ];
 
   static Map<String, dynamic> getRandomCity() {
