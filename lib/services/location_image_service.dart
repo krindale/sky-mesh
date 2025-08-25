@@ -511,7 +511,7 @@ class LocationImageService {
   /// ## 선택 우선순위
   /// ### 1단계: 정확한 도시명 매칭
   /// - 도시명이 68개 지원 도시와 정확히 일치
-  /// - 예: "Seoul" → seoul_sunny.png
+  /// - 예: "Seoul" → seoul_sunny.webp
   /// 
   /// ### 2단계: 같은 국가 내 도시 매칭
   /// - 2a) GPS 좌표가 있는 경우: 가장 가까운 도시 선택
@@ -520,7 +520,7 @@ class LocationImageService {
   /// 
   /// ### 3단계: 지역 대체 이미지
   /// - 국가에 지원 도시가 없는 경우 지역별 대체 이미지 사용
-  /// - 예: 파키스탄 → northern_india_cloudy.png
+  /// - 예: 파키스탄 → northern_india_cloudy.webp
   /// 
   /// ### 4단계: 랜덤 대체
   /// - 모든 매칭이 실패한 경우 68개 도시 중 랜덤 선택
@@ -538,7 +538,7 @@ class LocationImageService {
   ///   latitude: 37.5665,
   ///   longitude: 126.9780,
   /// );
-  /// // 결과: "assets/location_images/regions/asia/seoul_sunny.png"
+  /// // 결과: "assets/location_images/regions/asia/seoul_sunny.webp"
   /// ```
   static String selectBackgroundImage({
     required String cityName,
@@ -546,12 +546,14 @@ class LocationImageService {
     required String weatherDescription,
     double? latitude,
     double? longitude,
+    DateTime? sunrise,
+    DateTime? sunset,
   }) {
-    final weather = _mapWeatherCondition(weatherDescription);
+    final weather = _mapWeatherCondition(weatherDescription, sunrise: sunrise, sunset: sunset);
     print('🌍 Location: $cityName, $countryCode ($latitude, $longitude)');
     print('🌤️  Weather: $weatherDescription → $weather');
     
-    // 우선순위 1: 정확한 도시명 매치 (예: 'seoul' → seoul_cloudy.png)
+    // 우선순위 1: 정확한 도시명 매치 (예: 'seoul' → seoul_cloudy.webp)
     final cityKey = cityName.toLowerCase().replaceAll(' ', '');
     if (_cityImages.containsKey(cityKey)) {
       final cityImageNames = _cityImages[cityKey]!;
@@ -644,27 +646,84 @@ class LocationImageService {
   /// - **sunset**: 석양 시간대 (17-19시, 5-7시) 특별 처리
   /// 
   /// ## 시간대 고려사항
-  /// 오후 5-7시와 오전 5-7시에는 날씨와 무관하게 석양 이미지를 우선 선택합니다.
-  /// 이는 현실적인 석양/일출 분위기를 연출하기 위한 디자인 결정입니다.
+  /// 맑은 날씨일 때 일출/일몰 데이터를 기반으로 실제 해가 진 시간부터 해가 뜬 시간까지 석양 이미지를 사용합니다.
+  /// 일출/일몰 데이터가 없는 경우 기본 시간대(오후 5-7시, 오전 5-7시)를 사용합니다.
   /// 
   /// ## 기본값
   /// 어떤 매칭 규칙에도 해당하지 않는 경우 'sunny'를 기본값으로 반환합니다.
-  static String _mapWeatherCondition(String weatherDescription) {
+  static String _mapWeatherCondition(String weatherDescription, {DateTime? sunrise, DateTime? sunset}) {
     final description = weatherDescription.toLowerCase();
     
+    // 맑은 날씨나 구름 낀 날씨일 때 먼저 sunset 시간대 특별 처리 (다른 매핑보다 우선)
+    if (_isClearOrCloudyWeather(description)) {
+      final now = DateTime.now().toUtc(); // UTC로 변환해서 비교
+      
+      print('🌤️  Weather condition: "$weatherDescription" (${_isClearOrCloudyWeather(description) ? "sunset 적용 대상" : "sunset 제외"})');
+      
+      if (sunrise != null && sunset != null) {
+        print('🌅 API Data - Sunrise: ${sunrise.toLocal()}, Sunset: ${sunset.toLocal()}');
+        print('🌅 UTC Time - Sunrise: $sunrise, Sunset: $sunset, Now: $now');
+        // 실제 일출/일몰 시간 기반 처리
+        if (_isBetweenSunsetAndSunrise(now, sunrise, sunset)) {
+          print('🌆 Sunset time detected! (API 기반)');
+          return 'sunset';
+        } else {
+          print('☀️ Daytime detected (API 기반)');
+        }
+      } else {
+        print('⏰ No sunrise/sunset data from API, using default time ranges');
+        // 일출/일몰 데이터가 없는 경우 기본 시간대 사용 (UTC 기준)
+        final hour = now.hour;
+        if ((hour >= 17 && hour <= 19) || (hour >= 5 && hour <= 7)) {
+          print('🌆 Default sunset time detected! (UTC ${hour}시)');
+          return 'sunset';
+        } else {
+          print('☀️ Default daytime (UTC ${hour}시)');
+        }
+      }
+    } else {
+      print('🌧️  Weather condition: "$weatherDescription" (sunset 로직 제외 - 비/눈/안개)');
+    }
+    
+    // sunset이 아닌 경우 일반 날씨 매핑 적용
     for (final entry in _weatherMapping.entries) {
       if (description.contains(entry.key)) {
         return entry.value;
       }
     }
     
-    // 시간대별 특별 처리
-    final hour = DateTime.now().hour;
-    if ((hour >= 17 && hour <= 19) || (hour >= 5 && hour <= 7)) {
-      return 'sunset';
-    }
-    
     return 'sunny'; // 기본값
+  }
+  
+  /// 맑은 날씨 또는 구름 낀 날씨인지 확인 (sunset 적용 대상)
+  static bool _isClearOrCloudyWeather(String description) {
+    return description.contains('clear') || 
+           description.contains('few clouds') ||
+           description.contains('scattered clouds') ||
+           description.contains('broken clouds') ||
+           description.contains('overcast');
+  }
+  
+  /// 현재 시간이 일몰과 일출 사이인지 확인 (모든 시간은 UTC)
+  static bool _isBetweenSunsetAndSunrise(DateTime now, DateTime sunrise, DateTime sunset) {
+    // 일반적인 경우: sunrise < sunset (같은 날 또는 연속된 날)
+    // 밤 시간은 sunset 이후부터 다음 sunrise 이전까지
+    
+    print('🕐 Time comparison: sunrise=$sunrise, now=$now, sunset=$sunset');
+    
+    if (sunrise.isBefore(sunset)) {
+      // 정상적인 경우: 일출이 일몰보다 이전 (같은 날)
+      // 밤 시간: now < sunrise OR now > sunset
+      final isNight = now.isBefore(sunrise) || now.isAfter(sunset);
+      print('🕐 Normal case - isNight: $isNight');
+      return isNight;
+    } else {
+      // 특수한 경우: 일출이 일몰보다 이후 (날짜를 넘나드는 경우)
+      // 낮 시간: sunrise < now < sunset
+      final isDay = now.isAfter(sunrise) && now.isBefore(sunset);
+      print('🕐 Cross-date case - isNight: ${!isDay}');
+      return !isDay;
+    }
   }
 
   /// 도시별 이미지 경로 생성
@@ -680,16 +739,16 @@ class LocationImageService {
   /// 
   /// ## 경로 구조
   /// ```
-  /// assets/location_images/regions/{region}/{city}_{weather}.png
+  /// assets/location_images/regions/{region}/{city}_{weather}.webp
   /// ```
   /// 
   /// ## 예시
-  /// - seoul + sunny → "assets/location_images/regions/asia/seoul_sunny.png"
-  /// - paris + rainy → "assets/location_images/regions/europe/paris_rainy.png"
-  /// - sydney + cloudy → "assets/location_images/regions/oceania/sydney_cloudy.png"
+  /// - seoul + sunny → "assets/location_images/regions/asia/seoul_sunny.webp"
+  /// - paris + rainy → "assets/location_images/regions/europe/paris_rainy.webp"
+  /// - sydney + cloudy → "assets/location_images/regions/oceania/sydney_cloudy.webp"
   static String _buildImagePath(String cityName, String weather, {double? latitude, double? longitude}) {
     final region = _getCityRegion(cityName);
-    return 'assets/location_images/regions/$region/${cityName}_${weather}.png';
+    return 'assets/location_images/regions/$region/${cityName}_${weather}.webp';
   }
 
   /// 도시가 속한 지역 폴더명 반환
@@ -816,7 +875,7 @@ class LocationImageService {
   /// 
   /// ## 경로 구조
   /// ```
-  /// assets/location_images/regional_fallback/{region}/{region}_{weather}.png
+  /// assets/location_images/regional_fallback/{region}/{region}_{weather}.webp
   /// ```
   /// 
   /// ## 지원 대체 지역
@@ -831,7 +890,7 @@ class LocationImageService {
   /// - **west_africa**: 서아프리카
   /// - **oceania_extended**: 확장 오세아니아
   static String _buildRegionalImagePath(String regionName, String weather) {
-    return 'assets/location_images/regional_fallback/${regionName}/${regionName}_${weather}.png';
+    return 'assets/location_images/regional_fallback/${regionName}/${regionName}_${weather}.webp';
   }
 
   /// SkyMesh에서 지원하는 모든 고유 도시 목록 반환

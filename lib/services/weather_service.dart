@@ -337,7 +337,7 @@ class WeatherService {
   ///   latitude: 37.5665,
   ///   longitude: 126.9780,
   /// );
-  /// // 결과: "assets/location_images/regions/asia/seoul_sunny.png"
+  /// // 결과: "assets/location_images/regions/asia/seoul_sunny.webp"
   /// ```
   /// 
   /// ## 이미지 선택 로직
@@ -359,6 +359,8 @@ class WeatherService {
     required String weatherDescription,
     double? latitude,
     double? longitude,
+    DateTime? sunrise,
+    DateTime? sunset,
   }) {
     return _imageService.selectBackgroundImage(
       cityName: cityName,
@@ -366,6 +368,8 @@ class WeatherService {
       weatherDescription: weatherDescription,
       latitude: latitude,
       longitude: longitude,
+      sunrise: sunrise,
+      sunset: sunset,
     );
   }
 
@@ -380,9 +384,9 @@ class WeatherService {
   /// ```dart
   /// final randomImagePath = weatherService.getRandomImagePath();
   /// // 가능한 결과 예시:
-  /// // "assets/location_images/regions/europe/paris_sunset.png"
-  /// // "assets/location_images/regions/asia/tokyo_rainy.png"
-  /// // "assets/location_images/regional_fallback/oceania_extended/oceania_extended_cloudy.png"
+  /// // "assets/location_images/regions/europe/paris_sunset.webp"
+  /// // "assets/location_images/regions/asia/tokyo_rainy.webp"
+  /// // "assets/location_images/regional_fallback/oceania_extended/oceania_extended_cloudy.webp"
   /// ```
   /// 
   /// ## 이미지 풀
