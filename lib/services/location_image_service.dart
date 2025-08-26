@@ -4,18 +4,18 @@
 /// 468개의 로우폴리 스타일 이미지를 관리하며, 지능적인 매칭 알고리즘을 사용합니다.
 /// 
 /// ## 이미지 컴렉션 구성
-/// - **68개 주요 도시**: 전 세계 7개 대륙의 대표 도시들
+/// - **76개 주요 도시**: 전 세계 7개 대륙의 대표 도시들
 /// - **6가지 날씨 조건**: cloudy, foggy, rainy, snowy, sunny, sunset
 /// - **10개 지역 대체**: 도시가 없는 지역의 대체 이미지
-/// - **총 468개 이미지**: (68개 도시 × 6개 날씨) + (10개 지역 × 6개 날씨)
+/// - **총 516개 이미지**: (76개 도시 × 6개 날씨) + (10개 지역 × 6개 날씨)
 /// 
 /// ## 지원 지역
-/// - **아시아**: 서울, 도쿄, 베이징, 방콕, 싱가포르, 마닐라, 자카르타, 쿠알라룸푸르, 호치민, 방갈로르, 뮄바이, 상하이, 타이베이
-/// - **중동**: 두바이, 테헤란, 리야드, 텔아비브
-/// - **유럽**: 파리, 런던, 베를린, 로마, 암스테르담, 바르셀로나, 프라하, 스톡홀름, 비엔나, 취리히, 모스크바, 이스탄불
-/// - **북미**: 뉴욕, 로스앤젬레스, 샌프란시스코, 시애틀, 시카고, 보스턴, 마이애미, 워싱턴DC, 토론토, 밴쿠버, 멕시코시티
-/// - **남미**: 부에노스아이레스, 리우데자네이루, 산티아고, 상파울루
-/// - **아프리카**: 카이로, 요하네스버그, 나이로비, 카사블랑카, 라고스
+/// - **아시아**: 서울, 도쿄, 베이징, 방콕, 싱가포르, 마닐라, 자카르타, 쿠알라룸푸르, 호치민, 방갈로르, 뮄바이, 델리, 상하이, 타이베이, 오사카
+/// - **중동**: 두바이, 테헤란, 리야드, 텔아비브, 도하
+/// - **유럽**: 파리, 런던, 베를린, 로마, 암스테르담, 바르셀로나, 마드리드, 밀라노, 프라하, 스톡홀름, 비엔나, 취리히, 모스크바, 이스탄불
+/// - **북미**: 뉴욕, 로스앤젤레스, 샌프란시스코, 시애틀, 시카고, 보스턴, 마이애미, 워싱턴DC, 토론토, 밴쿠버, 몬트리올, 멕시코시티
+/// - **남미**: 부에노스아이레스, 리우데자네이루, 산티아고, 상파울루, 보고타
+/// - **아프리카**: 카이로, 요하네스버그, 나이로비, 카사블랑카, 케이프타운, 라고스
 /// - **오세아니아**: 시드니, 멜버른
 /// 
 /// ## 이미지 선택 우선순위
@@ -60,6 +60,7 @@ class LocationImageService {
     'seoul': ['seoul'],
     'tokyo': ['tokyo'], 
     'beijing': ['beijing'],
+    'beijing_municipality': ['beijing'],  // API에서 "Beijing Municipality"로 오는 경우
     'bangkok': ['bangkok'],
     'singapore': ['singapore'],
     'manila': ['manila'],
@@ -68,8 +69,15 @@ class LocationImageService {
     'ho_chi_minh': ['ho_chi_minh'],
     'bangalore': ['bangalore'],
     'mumbai': ['mumbai'],
+    'delhi': ['delhi'],
     'shanghai': ['shanghai'],
+    'shanghai_municipality': ['shanghai'],  // API에서 "Shanghai Municipality"로 오는 경우
+    'tianjin': ['beijing'],  // 톈진은 베이징과 같은 지역
+    'tianjin_municipality': ['beijing'],  // API에서 "Tianjin Municipality"로 오는 경우
+    'chongqing': ['beijing'],  // 충칭은 베이징과 같은 지역
+    'chongqing_municipality': ['beijing'],  // API에서 "Chongqing Municipality"로 오는 경우
     'taipei': ['taipei'],
+    'osaka': ['osaka'],
     'sapporo': ['sapporo'],
     'bali': ['bali'],
     'phuket': ['phuket'],
@@ -131,6 +139,7 @@ class LocationImageService {
     'tehran': ['tehran'],
     'riyadh': ['riyadh'],
     'tel_aviv': ['tel_aviv'],
+    'doha': ['doha'],
     'petra': ['petra'],
     
     // 유럽
@@ -140,6 +149,8 @@ class LocationImageService {
     'rome': ['rome'],
     'amsterdam': ['amsterdam'],
     'barcelona': ['barcelona'],
+    'madrid': ['madrid'],
+    'milan': ['milan'],
     'prague': ['prague'],
     'stockholm': ['stockholm'],
     'vienna': ['vienna'],
@@ -159,8 +170,10 @@ class LocationImageService {
     'boston': ['boston'],
     'miami': ['miami'],
     'washington_dc': ['washington_dc'],
+    'washington': ['washington_dc'],  // "Washington"만으로 오는 경우
     'toronto': ['toronto'],
     'vancouver': ['vancouver'],
+    'montreal': ['montreal'],
     'mexico_city': ['mexico_city'],
     'cancun': ['cancun'],
     'aspen': ['aspen'],
@@ -170,6 +183,7 @@ class LocationImageService {
     'rio_de_janeiro': ['rio_de_janeiro'],
     'santiago': ['santiago'],
     'sao_paulo': ['sao_paulo'],
+    'bogota': ['bogota'],
     'machu_picchu': ['machu_picchu'],
     
     // 아프리카
@@ -177,6 +191,7 @@ class LocationImageService {
     'johannesburg': ['johannesburg'],
     'nairobi': ['nairobi'],
     'casablanca': ['casablanca'],
+    'cape_town': ['cape_town'],
     'lagos': ['lagos'],
     
     // 오세아니아
@@ -201,8 +216,10 @@ class LocationImageService {
     'ho_chi_minh': [10.8231, 106.6297],
     'bangalore': [12.9716, 77.5946],
     'mumbai': [19.0760, 72.8777],
+    'delhi': [28.7041, 77.1025],
     'shanghai': [31.2304, 121.4737],
     'taipei': [25.0330, 121.5654],
+    'osaka': [34.6937, 135.5023],
     'sapporo': [43.0642, 141.3469],
     'bali': [-8.3405, 115.0920],
     'phuket': [7.8804, 98.3923],
@@ -214,6 +231,7 @@ class LocationImageService {
     'tehran': [35.6892, 51.3890],
     'riyadh': [24.7136, 46.6753],
     'tel_aviv': [32.0853, 34.7818],
+    'doha': [25.2854, 51.5310],
     'petra': [30.3285, 35.4444],
     
     // 유럽
@@ -223,6 +241,8 @@ class LocationImageService {
     'rome': [41.9028, 12.4964],
     'amsterdam': [52.3676, 4.9041],
     'barcelona': [41.3851, 2.1734],
+    'madrid': [40.4168, -3.7038],
+    'milan': [45.4642, 9.1900],
     'prague': [50.0755, 14.4378],
     'stockholm': [59.3293, 18.0686],
     'vienna': [48.2082, 16.3738],
@@ -244,6 +264,7 @@ class LocationImageService {
     'washington_dc': [38.9072, -77.0369],
     'toronto': [43.6532, -79.3832],
     'vancouver': [49.2827, -123.1207],
+    'montreal': [45.5017, -73.5673],
     'mexico_city': [19.4326, -99.1332],
     'cancun': [21.1619, -86.8515],
     'aspen': [39.1911, -106.8175],
@@ -253,6 +274,7 @@ class LocationImageService {
     'rio_de_janeiro': [-22.9068, -43.1729],
     'santiago': [-33.4489, -70.6693],
     'sao_paulo': [-23.5505, -46.6333],
+    'bogota': [4.7110, -74.0721],
     'machu_picchu': [-13.1631, -72.5450],
     
     // 아프리카
@@ -260,6 +282,7 @@ class LocationImageService {
     'johannesburg': [-26.2041, 28.0473],
     'nairobi': [-1.2921, 36.8219],
     'casablanca': [33.5731, -7.5898],
+    'cape_town': [-33.9249, 18.4241],
     'lagos': [6.5244, 3.3792],
     
     // 오세아니아
@@ -275,7 +298,7 @@ class LocationImageService {
     // 아시아
     'KR': ['seoul'], 
     'KP': ['seoul'],  // 북한
-    'JP': ['tokyo', 'sapporo'],
+    'JP': ['tokyo', 'sapporo', 'osaka'],
     'CN': ['beijing', 'shanghai'],
     'TH': ['bangkok', 'phuket'],
     'SG': ['singapore'],
@@ -283,13 +306,14 @@ class LocationImageService {
     'ID': ['jakarta', 'bali'],
     'MY': ['kuala_lumpur'],
     'VN': ['ho_chi_minh'],
-    'IN': ['bangalore', 'mumbai'],
+    'IN': ['bangalore', 'mumbai', 'delhi'],
     'TW': ['taipei'],
     'KH': ['angkor_wat'],  // 캄보디아
     'MV': ['maldives'],    // 몰디브
     
     // 중동
     'AE': ['dubai'],
+    'QA': ['doha'],
     'IR': ['tehran'],
     'SA': ['riyadh'],
     'IL': ['tel_aviv'],
@@ -299,9 +323,9 @@ class LocationImageService {
     'FR': ['paris'],
     'GB': ['london'],
     'DE': ['berlin'],
-    'IT': ['rome'],
+    'IT': ['rome', 'milan'],
     'NL': ['amsterdam'],
-    'ES': ['barcelona'],
+    'ES': ['barcelona', 'madrid'],
     'CZ': ['prague'],
     'SE': ['stockholm'],
     'AT': ['vienna'],
@@ -313,18 +337,19 @@ class LocationImageService {
     
     // 북미
     'US': ['san_francisco', 'los_angeles', 'seattle', 'new_york', 'chicago', 'boston', 'miami', 'washington_dc', 'aspen', 'hawaii'],
-    'CA': ['toronto', 'vancouver'],
+    'CA': ['toronto', 'vancouver', 'montreal'],
     'MX': ['mexico_city', 'cancun'],
     
     // 남미
     'AR': ['buenos_aires'],
     'BR': ['rio_de_janeiro', 'sao_paulo'],
     'CL': ['santiago'],
+    'CO': ['bogota'],  // 콜롬비아
     'PE': ['machu_picchu'],  // 페루
     
     // 아프리카
     'EG': ['cairo'],
-    'ZA': ['johannesburg'],
+    'ZA': ['johannesburg', 'cape_town'],
     'KE': ['nairobi'],
     'MA': ['casablanca'],
     'NG': ['lagos'],
@@ -366,7 +391,6 @@ class LocationImageService {
     'TL': 'southeast_asia_extended', // 동티모르
     
     // 중동 (지원 도시 없는 국가들)  
-    'QA': 'middle_east',     // 카타르
     'KW': 'middle_east',     // 쿠웨이트
     'BH': 'middle_east',     // 바레인
     'OM': 'middle_east',     // 오만
@@ -448,7 +472,6 @@ class LocationImageService {
     'PT': 'eastern_europe',  // 포르투갈
     
     // 남미 (지원 도시 없는 국가들)
-    'CO': 'northern_andes',  // 콜롬비아
     'EC': 'northern_andes',  // 에콰도르
     'VE': 'northern_andes',  // 베네수엘라
     'BO': 'northern_andes',  // 볼리비아
@@ -509,7 +532,7 @@ class LocationImageService {
   /// 
   /// ## 선택 우선순위
   /// ### 1단계: 정확한 도시명 매칭
-  /// - 도시명이 68개 지원 도시와 정확히 일치
+  /// - 도시명이 76개 지원 도시와 정확히 일치
   /// - 예: "Seoul" → seoul_sunny.webp
   /// 
   /// ### 2단계: 같은 국가 내 도시 매칭
@@ -522,7 +545,7 @@ class LocationImageService {
   /// - 예: 파키스탄 → northern_india_cloudy.webp
   /// 
   /// ### 4단계: 랜덤 대체
-  /// - 모든 매칭이 실패한 경우 68개 도시 중 랜덤 선택
+  /// - 모든 매칭이 실패한 경우 76개 도시 중 랜덤 선택
   /// 
   /// ## 특별 처리 지역
   /// - **중국**: 방남부(위도 26도 이남)와 내륡 지역 구분
@@ -554,7 +577,7 @@ class LocationImageService {
     Logger.weather('$weatherDescription → $weather');
     
     // 우선순위 1: 정확한 도시명 매치 (예: 'seoul' → seoul_cloudy.webp)
-    final cityKey = cityName.toLowerCase().replaceAll(' ', '');
+    final cityKey = cityName.toLowerCase().replaceAll(' ', '_');
     if (_cityImages.containsKey(cityKey)) {
       final cityImageNames = _cityImages[cityKey]!;
       final selectedCity = cityImageNames[Random().nextInt(cityImageNames.length)];
@@ -753,19 +776,19 @@ class LocationImageService {
 
   /// 도시가 속한 지역 폴더명 반환
   /// 
-  /// 68개 지원 도시를 7개 지역 폴더로 분류하여 해당 도시가 속한
+  /// 76개 지원 도시를 7개 지역 폴더로 분류하여 해당 도시가 속한
   /// 지역명을 반환합니다. 이는 이미지 파일 경로 생성에 사용됩니다.
   /// 
   /// @param cityName 도시명 (예: "seoul", "paris")
   /// @return String 지역 폴더명
   /// 
   /// ## 지역 분류
-  /// - **asia**: 아시아 13개 도시
-  /// - **middle_east**: 중동 4개 도시  
-  /// - **europe**: 유럽 12개 도시
-  /// - **north_america**: 북미 11개 도시
-  /// - **south_america**: 남미 4개 도시
-  /// - **africa**: 아프리카 5개 도시
+  /// - **asia**: 아시아 15개 도시
+  /// - **middle_east**: 중동 5개 도시  
+  /// - **europe**: 유럽 14개 도시
+  /// - **north_america**: 북미 12개 도시
+  /// - **south_america**: 남미 5개 도시
+  /// - **africa**: 아프리카 6개 도시
   /// - **oceania**: 오세아니아 2개 도시
   /// 
   /// ## 기본값
@@ -784,12 +807,14 @@ class LocationImageService {
       'ho_chi_minh': 'asia',
       'bangalore': 'asia',
       'mumbai': 'asia',
+      'delhi': 'asia',
       
       // 중동
       'dubai': 'middle_east',
       'tehran': 'middle_east',
       'riyadh': 'middle_east',
       'tel_aviv': 'middle_east',
+      'doha': 'middle_east',
       
       // 유럽
       'paris': 'europe',
@@ -798,6 +823,8 @@ class LocationImageService {
       'rome': 'europe',
       'amsterdam': 'europe',
       'barcelona': 'europe',
+      'madrid': 'europe',
+      'milan': 'europe',
       'prague': 'europe',
       'stockholm': 'europe',
       'vienna': 'europe',
@@ -816,6 +843,7 @@ class LocationImageService {
       'washington_dc': 'north_america',
       'toronto': 'north_america',
       'vancouver': 'north_america',
+      'montreal': 'north_america',
       'mexico_city': 'north_america',
       
       // 남미
@@ -823,16 +851,19 @@ class LocationImageService {
       'rio_de_janeiro': 'south_america',
       'santiago': 'south_america',
       'sao_paulo': 'south_america',
+      'bogota': 'south_america',
       
       // 아프리카
       'cairo': 'africa',
       'johannesburg': 'africa',
       'nairobi': 'africa',
       'casablanca': 'africa',
+      'cape_town': 'africa',
       'lagos': 'africa',
       'shanghai': 'asia',
       'taipei': 'asia',
       'sapporo': 'asia',
+      'osaka': 'asia',
       'bali': 'asia',
       'phuket': 'asia',
       'angkor_wat': 'asia',

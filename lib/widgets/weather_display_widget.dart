@@ -655,10 +655,10 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
 
           // === 현재 시간 ===
 
-          /// HH:mm 형식의 현재 시간 표시
-          /// 사용자가 언제 데이터를 확인하는지 알 수 있도록
+          /// HH:mm 형식의 도시 로컬 시간 표시
+          /// 선택된 도시의 시간대에 맞는 현재 시간 표시
           Text(
-            _getCurrentTime(),
+            widget.weatherData?.cityLocalTime ?? _getCurrentTime(),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.8), // 날씨 정보보다 덜 강조
               fontSize: 16, // 보조 정보에 적합한 크기

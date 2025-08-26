@@ -45,7 +45,16 @@
       "Bash(flutter analyze:*)",
       "Bash(sed:*)",
       "Bash(flutter test:*)",
-      "Bash(dart:*)"
+      "Bash(dart:*)",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_minus_5\\bogota_$weather_00001_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\south_america\\bogota_$weather.webp\")",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_minus_5\\montreal_$weather_00001_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\north_america\\montreal_$weather.webp\")",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_plus_1\\madrid_$weather_00001_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\europe\\madrid_$weather.webp\")",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_plus_1\\milan_$weather_00001_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\europe\\milan_$weather.webp\")",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_plus_2\\cape_town_$weather_00001_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\africa\\cape_town_$weather.webp\")",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_plus_3\\doha_$weather_00001_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\middle_east\\doha_$weather.webp\")",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_plus_5_30\\delhi_$weather_00001_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\asia\\delhi_$weather.webp\")",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_plus_9\\osaka_$weather_00001_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\asia\\osaka_$weather.webp\")",
+      "Bash(do cp \"C:\\flutter\\sky_mesh\\assets\\new_images\\timezones\\utc_plus_9\\tokyo_$weather_00002_.webp\" \"C:\\flutter\\sky_mesh\\assets\\location_images\\regions\\asia\\tokyo_$weather.webp\")"
     ],
     "deny": [],
     "ask": [],

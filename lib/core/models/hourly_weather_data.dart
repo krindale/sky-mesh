@@ -20,7 +20,7 @@ class HourlyWeatherForecast {
 
   factory HourlyWeatherForecast.fromJson(Map<String, dynamic> json) {
     return HourlyWeatherForecast(
-      dateTime: DateTime.fromMillisecondsSinceEpoch(json['dt'] * 1000),
+      dateTime: DateTime.fromMillisecondsSinceEpoch(json['dt'] * 1000, isUtc: true),
       temperature: json['main']['temp'].toDouble(),
       description: json['weather'][0]['description'],
       iconCode: json['weather'][0]['icon'],
@@ -31,7 +31,10 @@ class HourlyWeatherForecast {
   }
 
   String get temperatureString => '${temperature.round()}°';
-  String get hour => '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  String get hour {
+    final localTime = dateTime.toLocal();
+    return '${localTime.hour.toString().padLeft(2, '0')}:${localTime.minute.toString().padLeft(2, '0')}';
+  }
   
   String get capitalizedDescription {
     return description.split(' ').map((word) => 
