@@ -137,8 +137,8 @@ class WeatherData {
       pm25: 0.0, // Will be updated by air quality API call
       pm10: 0.0, // Will be updated by air quality API call
       precipitationProbability: 0.0, // Will be updated by forecast API call
-      latitude: json['coord']['lat']?.toDouble(),
-      longitude: json['coord']['lon']?.toDouble(),
+      latitude: json['coord'] != null ? json['coord']['lat']?.toDouble() : null,
+      longitude: json['coord'] != null ? json['coord']['lon']?.toDouble() : null,
       sunrise: sunrise,
       sunset: sunset,
     );

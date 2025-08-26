@@ -1522,7 +1522,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
         return Container(
           height: MediaQuery.of(context).size.height * 0.75,
           decoration: BoxDecoration(
-            color: LowPolyColors.surfaceLight,
+            color: LowPolyColors.surfaceDeep.withValues(alpha: 0.95),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -1555,7 +1555,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget>
                     Text(
                       'Today\'s Briefing',
                       style: LowPolyTypography.headlineSmall.copyWith(
-                        color: LowPolyColors.textPrimary,
+                        color: LowPolyColors.textOnDark,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

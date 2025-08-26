@@ -229,42 +229,6 @@ class WeatherConditionCardsWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section header
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          //   child: Row(
-          //     children: [
-          //       Text(
-          //         'Today\'s Briefing',
-          //         style: LowPolyTypography.headlineSmall.copyWith(
-          //           color: LowPolyColors.textPrimary,
-          //           fontWeight: FontWeight.w600,
-          //         ),
-          //       ),
-          //       const SizedBox(width: 8),
-          //       Container(
-          //         padding: const EdgeInsets.symmetric(
-          //           horizontal: 6.0,
-          //           vertical: 2.0,
-          //         ),
-          //         decoration: BoxDecoration(
-          //           color: LowPolyColors.primaryBlue.withOpacity(0.1),
-          //           borderRadius: BorderRadius.circular(8.0),
-          //         ),
-          //         child: Text(
-          //           '${cards.length}',
-          //           style: LowPolyTypography.labelSmall.copyWith(
-          //             color: LowPolyColors.primaryBlue,
-          //             fontWeight: FontWeight.w600,
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-
-          // const SizedBox(height: 12),
-
           // Cards list
           ...cards.map(
             (card) => WeatherConditionCardWidget(card: card, onTap: onCardTap),
