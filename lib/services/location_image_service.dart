@@ -547,8 +547,9 @@ class LocationImageService {
     double? longitude,
     DateTime? sunrise,
     DateTime? sunset,
+    DateTime? currentTime,
   }) {
-    final weather = _mapWeatherCondition(weatherDescription, sunrise: sunrise, sunset: sunset);
+    final weather = _mapWeatherCondition(weatherDescription, sunrise: sunrise, sunset: sunset, currentTime: currentTime);
     Logger.location('$cityName, $countryCode ($latitude, $longitude)');
     Logger.weather('$weatherDescription → $weather');
     
@@ -650,12 +651,12 @@ class LocationImageService {
   /// 
   /// ## 기본값
   /// 어떤 매칭 규칙에도 해당하지 않는 경우 'sunny'를 기본값으로 반환합니다.
-  static String _mapWeatherCondition(String weatherDescription, {DateTime? sunrise, DateTime? sunset}) {
+  static String _mapWeatherCondition(String weatherDescription, {DateTime? sunrise, DateTime? sunset, DateTime? currentTime}) {
     final description = weatherDescription.toLowerCase();
     
     // 맑은 날씨나 구름 낀 날씨일 때 먼저 sunset 시간대 특별 처리 (다른 매핑보다 우선)
     if (_isClearOrCloudyWeather(description)) {
-      final now = DateTime.now().toUtc(); // UTC로 변환해서 비교
+      final now = currentTime?.toUtc() ?? DateTime.now().toUtc(); // UTC로 변환해서 비교
       
       Logger.weather('Weather condition: "$weatherDescription" (${_isClearOrCloudyWeather(description) ? "sunset 적용 대상" : "sunset 제외"})');
       

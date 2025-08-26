@@ -44,6 +44,9 @@ import '../utils/logger.dart';
 /// ### Environmental Data
 /// - [uvIndex]: UV radiation index (0-11+ scale)
 /// - [airQuality]: Air quality index (1-5 scale, 1=good, 5=poor)
+/// - [pm25]: PM2.5 concentration (µg/m³)
+/// - [pm10]: PM10 concentration (µg/m³)
+/// - [precipitationProbability]: Precipitation probability (0.0-1.0)
 class WeatherData {
   final double temperature;
   final double feelsLike;
@@ -55,8 +58,11 @@ class WeatherData {
   final String country;
   final int pressure;
   final int visibility;
-  final int uvIndex;
-  final int airQuality;
+  final double? uvIndex;
+  final int? airQuality;
+  final double pm25;
+  final double pm10;
+  final double precipitationProbability;
   final double? latitude;
   final double? longitude;
   final DateTime? sunrise;
@@ -77,8 +83,11 @@ class WeatherData {
     required this.country,
     required this.pressure,
     required this.visibility,
-    required this.uvIndex,
-    required this.airQuality,
+    this.uvIndex,
+    this.airQuality,
+    required this.pm25,
+    required this.pm10,
+    required this.precipitationProbability,
     this.latitude,
     this.longitude,
     this.sunrise,
@@ -123,10 +132,13 @@ class WeatherData {
       country: json['sys']['country'],
       pressure: json['main']['pressure'],
       visibility: json['visibility'] ?? 10000, // Default 10km if not provided
-      uvIndex: 5, // TODO: Implement separate UV index API call
-      airQuality: 2, // TODO: Implement separate air quality API call
-      latitude: json['coord']['lat']?.toDouble(),
-      longitude: json['coord']['lon']?.toDouble(),
+      uvIndex: null, // Will be updated by separate UV API call
+      airQuality: null, // Will be updated by separate air quality API call
+      pm25: 0.0, // Will be updated by air quality API call
+      pm10: 0.0, // Will be updated by air quality API call
+      precipitationProbability: 0.0, // Will be updated by forecast API call
+      latitude: json['coord'] != null ? json['coord']['lat']?.toDouble() : null,
+      longitude: json['coord'] != null ? json['coord']['lon']?.toDouble() : null,
       sunrise: sunrise,
       sunset: sunset,
     );
@@ -152,11 +164,20 @@ class WeatherData {
   /// Visibility formatted in kilometers (e.g., "10.0 km")
   String get visibilityString => '${(visibility / 1000).toStringAsFixed(1)} km';
   
-  /// UV index as string (e.g., "5")
-  String get uvIndexString => uvIndex.toString();
+  /// UV index as string (e.g., "5" or "-" if not available)
+  String get uvIndexString => uvIndex?.round().toString() ?? '-';
   
-  /// Air quality index as string (e.g., "2")
-  String get airQualityString => airQuality.toString();
+  /// Air quality index as string (e.g., "2" or "-" if not available)
+  String get airQualityString => airQuality?.toString() ?? '-';
+  
+  /// PM2.5 concentration formatted with unit (e.g., "10.3 µg/m³")
+  String get pm25String => '${pm25.toStringAsFixed(1)} µg/m³';
+  
+  /// PM10 concentration formatted with unit (e.g., "18.9 µg/m³")
+  String get pm10String => '${pm10.toStringAsFixed(1)} µg/m³';
+  
+  /// Precipitation probability formatted as percentage (e.g., "80%")
+  String get precipitationProbabilityString => '${(precipitationProbability * 100).round()}%';
   
   // MARK: - Separated Number and Unit Getters
   // For UI flexibility when styling numbers and units differently

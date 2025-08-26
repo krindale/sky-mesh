@@ -80,6 +80,9 @@ class MockWeatherStrategy implements WeatherStrategy {
       visibility: 10000,
       uvIndex: 5,
       airQuality: 2,
+      pm25: 15.0,
+      pm10: 25.0,
+      precipitationProbability: 0.2,
       latitude: 37.5665,
       longitude: 126.9780,
     );

@@ -43,7 +43,9 @@
       "Bash(git checkout:*)",
       "Bash(git add:*)",
       "Bash(flutter analyze:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(flutter test:*)",
+      "Bash(dart:*)"
     ],
     "deny": [],
     "ask": [],

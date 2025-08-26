@@ -57,6 +57,8 @@ class OpenWeatherApiService implements
   static const String _apiKey = 'a179131038d53e44738851b4938c5cd0';
   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
   static const String _forecastUrl = 'https://api.openweathermap.org/data/2.5/forecast';
+  static const String _uvUrl = 'http://api.openweathermap.org/data/2.5/uvi';
+  static const String _airPollutionUrl = 'http://api.openweathermap.org/data/2.5/air_pollution';
 
   final LocationService _locationService;
   final WeatherDataFactory _weatherDataFactory;
@@ -84,19 +86,118 @@ class OpenWeatherApiService implements
   @override
   Future<WeatherData> getWeatherByCoordinates(double latitude, double longitude) async {
     try {
+      // Get basic weather data
       final response = await http.get(
         Uri.parse('$_baseUrl?lat=$latitude&lon=$longitude&appid=$_apiKey&units=metric'),
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return WeatherData.fromJson(data);
+        var weather = WeatherData.fromJson(data);
+        
+        // Enhance with UV index and air quality data
+        weather = await _enhanceWeatherData(weather, latitude, longitude);
+        
+        return weather;
       } else {
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
     } catch (e) {
       Logger.debug('Error loading weather by coordinates: $e');
       return _weatherDataFactory.createMockWeatherData();
+    }
+  }
+  
+  /// Enhances weather data with UV index and air quality information
+  Future<WeatherData> _enhanceWeatherData(WeatherData weather, double latitude, double longitude) async {
+    try {
+      // Get UV index data
+      double? uvIndex = weather.uvIndex;
+      try {
+        final uvResponse = await http.get(
+          Uri.parse('$_uvUrl?lat=$latitude&lon=$longitude&appid=$_apiKey'),
+        );
+        
+        if (uvResponse.statusCode == 200) {
+          final uvData = json.decode(uvResponse.body);
+          uvIndex = uvData['value']?.toDouble();
+          Logger.debug('📊 UV Index API: $uvIndex');
+        }
+      } catch (e) {
+        Logger.warning('Failed to fetch UV index: $e');
+      }
+      
+      // Get air quality data
+      int? airQuality = weather.airQuality;
+      double pm25 = weather.pm25;
+      double pm10 = weather.pm10;
+      
+      try {
+        final airResponse = await http.get(
+          Uri.parse('$_airPollutionUrl?lat=$latitude&lon=$longitude&appid=$_apiKey'),
+        );
+        
+        if (airResponse.statusCode == 200) {
+          final airData = json.decode(airResponse.body);
+          final components = airData['list'][0]['components'];
+          
+          airQuality = airData['list'][0]['main']['aqi'];
+          pm25 = components['pm2_5']?.toDouble() ?? pm25;
+          pm10 = components['pm10']?.toDouble() ?? pm10;
+          
+          Logger.debug('📊 Air Quality API: AQI=$airQuality, PM2.5=$pm25, PM10=$pm10');
+        }
+      } catch (e) {
+        Logger.warning('Failed to fetch air quality: $e');
+      }
+      
+      // Get precipitation probability from forecast
+      double precipitationProbability = weather.precipitationProbability;
+      try {
+        final forecastResponse = await http.get(
+          Uri.parse('$_forecastUrl?lat=$latitude&lon=$longitude&appid=$_apiKey&units=metric'),
+        );
+        
+        if (forecastResponse.statusCode == 200) {
+          final forecastData = json.decode(forecastResponse.body);
+          final forecasts = forecastData['list'] as List;
+          
+          if (forecasts.isNotEmpty) {
+            // Use first forecast entry for current precipitation probability
+            precipitationProbability = forecasts[0]['pop']?.toDouble() ?? precipitationProbability;
+            Logger.debug('📊 Precipitation probability: ${(precipitationProbability * 100).round()}%');
+          }
+        }
+      } catch (e) {
+        Logger.warning('Failed to fetch precipitation data: $e');
+      }
+      
+      // Create enhanced weather data
+      return WeatherData(
+        temperature: weather.temperature,
+        feelsLike: weather.feelsLike,
+        humidity: weather.humidity,
+        windSpeed: weather.windSpeed,
+        description: weather.description,
+        iconCode: weather.iconCode,
+        cityName: weather.cityName,
+        country: weather.country,
+        pressure: weather.pressure,
+        visibility: weather.visibility,
+        uvIndex: uvIndex,
+        airQuality: airQuality,
+        pm25: pm25,
+        pm10: pm10,
+        precipitationProbability: precipitationProbability,
+        latitude: weather.latitude,
+        longitude: weather.longitude,
+        sunrise: weather.sunrise,
+        sunset: weather.sunset,
+      );
+      
+    } catch (e) {
+      Logger.warning('Error enhancing weather data: $e');
+      return weather; // Return original data if enhancement fails
     }
   }
 
@@ -115,7 +216,12 @@ class OpenWeatherApiService implements
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return WeatherData.fromJson(data);
+        var weather = WeatherData.fromJson(data);
+        
+        // Enhance with UV index and air quality data
+        weather = await _enhanceWeatherData(weather, latitude, longitude);
+        
+        return weather;
       } else {
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
@@ -220,8 +326,11 @@ class WeatherDataFactory {
       country: 'KR',
       pressure: 1013,
       visibility: 10000,
-      uvIndex: 5,
+      uvIndex: 5.0,
       airQuality: 2,
+      pm25: 15.0,
+      pm10: 25.0,
+      precipitationProbability: 0.2,
       latitude: 37.5665,
       longitude: 126.9780,
     );
@@ -255,8 +364,11 @@ class WeatherDataFactory {
       country: randomCity['country'] as String,
       pressure: 980 + Random().nextInt(60),
       visibility: 5000 + Random().nextInt(10000),
-      uvIndex: Random().nextInt(11),
+      uvIndex: Random().nextDouble() * 12, // 0-12 UV index
       airQuality: 1 + Random().nextInt(5),
+      pm25: 5.0 + Random().nextDouble() * 50, // 5-55 µg/m³
+      pm10: 10.0 + Random().nextDouble() * 80, // 10-90 µg/m³
+      precipitationProbability: Random().nextDouble(), // 0.0-1.0
       latitude: randomCity['latitude'] as double,
       longitude: randomCity['longitude'] as double,
     );
