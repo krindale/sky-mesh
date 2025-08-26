@@ -24,11 +24,15 @@ class DailyWeatherForecast {
   String get minTemperatureString => '${minTemperature.round()}°';
   
   String get dayOfWeek {
+    final localDate = date.toLocal();
     const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-    return weekdays[date.weekday % 7];
+    return weekdays[localDate.weekday % 7];
   }
   
-  String get dateString => '${date.month}/${date.day}';
+  String get dateString {
+    final localDate = date.toLocal();
+    return '${localDate.month}/${localDate.day}';
+  }
   
   String get capitalizedDescription {
     return description.split(' ').map((word) => 
@@ -38,7 +42,8 @@ class DailyWeatherForecast {
   
   bool get isToday {
     final now = DateTime.now();
-    return date.year == now.year && date.month == now.month && date.day == now.day;
+    final localDate = date.toLocal();
+    return localDate.year == now.year && localDate.month == now.month && localDate.day == now.day;
   }
 }
 
@@ -61,7 +66,7 @@ class WeeklyWeatherData {
     final Map<String, List<dynamic>> dailyData = {};
     
     for (var item in list) {
-      final dt = DateTime.fromMillisecondsSinceEpoch(item['dt'] * 1000);
+      final dt = DateTime.fromMillisecondsSinceEpoch(item['dt'] * 1000, isUtc: true);
       final dateKey = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
       
       if (!dailyData.containsKey(dateKey)) {
@@ -103,7 +108,7 @@ class WeeklyWeatherData {
       iconCode = noonData['weather'][0]['icon'];
       
       dailyForecasts.add(DailyWeatherForecast(
-        date: DateTime.fromMillisecondsSinceEpoch(dayData.first['dt'] * 1000),
+        date: DateTime.fromMillisecondsSinceEpoch(dayData.first['dt'] * 1000, isUtc: true),
         maxTemperature: maxTemp,
         minTemperature: minTemp,
         description: description,

@@ -193,6 +193,7 @@ class OpenWeatherApiService implements
         longitude: weather.longitude,
         sunrise: weather.sunrise,
         sunset: weather.sunset,
+        timezone: weather.timezone, // 타임존 정보 추가
       );
       
     } catch (e) {
@@ -484,8 +485,10 @@ class RandomCityProvider {
     {'latitude': 10.8231, 'longitude': 106.6297, 'name': 'Ho Chi Minh City', 'country': 'VN'},
     {'latitude': 12.9716, 'longitude': 77.5946, 'name': 'Bangalore', 'country': 'IN'},
     {'latitude': 19.0760, 'longitude': 72.8777, 'name': 'Mumbai', 'country': 'IN'},
+    {'latitude': 28.7041, 'longitude': 77.1025, 'name': 'Delhi', 'country': 'IN'},
     {'latitude': 31.2304, 'longitude': 121.4737, 'name': 'Shanghai', 'country': 'CN'},
     {'latitude': 25.0330, 'longitude': 121.5654, 'name': 'Taipei', 'country': 'TW'},
+    {'latitude': 34.6937, 'longitude': 135.5023, 'name': 'Osaka', 'country': 'JP'},
     
     // 새로 추가된 아시아 도시들
     {'latitude': 43.0642, 'longitude': 141.3469, 'name': 'Sapporo', 'country': 'JP'},
@@ -498,6 +501,7 @@ class RandomCityProvider {
     {'latitude': 35.6892, 'longitude': 51.3890, 'name': 'Tehran', 'country': 'IR'},
     {'latitude': 24.7136, 'longitude': 46.6753, 'name': 'Riyadh', 'country': 'SA'},
     {'latitude': 32.0853, 'longitude': 34.7818, 'name': 'Tel Aviv', 'country': 'IL'},
+    {'latitude': 25.2854, 'longitude': 51.5310, 'name': 'Doha', 'country': 'QA'},
     {'latitude': 30.3285, 'longitude': 35.4444, 'name': 'Petra', 'country': 'JO'},
     {'latitude': 48.8566, 'longitude': 2.3522, 'name': 'Paris', 'country': 'FR'},
     {'latitude': 51.5074, 'longitude': -0.1278, 'name': 'London', 'country': 'GB'},
@@ -505,6 +509,8 @@ class RandomCityProvider {
     {'latitude': 41.9028, 'longitude': 12.4964, 'name': 'Rome', 'country': 'IT'},
     {'latitude': 52.3676, 'longitude': 4.9041, 'name': 'Amsterdam', 'country': 'NL'},
     {'latitude': 41.3851, 'longitude': 2.1734, 'name': 'Barcelona', 'country': 'ES'},
+    {'latitude': 40.4168, 'longitude': -3.7038, 'name': 'Madrid', 'country': 'ES'},
+    {'latitude': 45.4642, 'longitude': 9.1900, 'name': 'Milan', 'country': 'IT'},
     {'latitude': 50.0755, 'longitude': 14.4378, 'name': 'Prague', 'country': 'CZ'},
     {'latitude': 59.3293, 'longitude': 18.0686, 'name': 'Stockholm', 'country': 'SE'},
     {'latitude': 48.2082, 'longitude': 16.3738, 'name': 'Vienna', 'country': 'AT'},
@@ -526,6 +532,7 @@ class RandomCityProvider {
     {'latitude': 38.9072, 'longitude': -77.0369, 'name': 'Washington DC', 'country': 'US'},
     {'latitude': 43.6532, 'longitude': -79.3832, 'name': 'Toronto', 'country': 'CA'},
     {'latitude': 49.2827, 'longitude': -123.1207, 'name': 'Vancouver', 'country': 'CA'},
+    {'latitude': 45.5017, 'longitude': -73.5673, 'name': 'Montreal', 'country': 'CA'},
     {'latitude': 19.4326, 'longitude': -99.1332, 'name': 'Mexico City', 'country': 'MX'},
     
     // 새로 추가된 북미 도시들
@@ -535,6 +542,7 @@ class RandomCityProvider {
     {'latitude': -22.9068, 'longitude': -43.1729, 'name': 'Rio de Janeiro', 'country': 'BR'},
     {'latitude': -33.4489, 'longitude': -70.6693, 'name': 'Santiago', 'country': 'CL'},
     {'latitude': -23.5505, 'longitude': -46.6333, 'name': 'São Paulo', 'country': 'BR'},
+    {'latitude': 4.7110, 'longitude': -74.0721, 'name': 'Bogotá', 'country': 'CO'},
     
     // 새로 추가된 남미 도시들
     {'latitude': -13.1631, 'longitude': -72.5450, 'name': 'Machu Picchu', 'country': 'PE'},
@@ -542,6 +550,7 @@ class RandomCityProvider {
     {'latitude': -26.2041, 'longitude': 28.0473, 'name': 'Johannesburg', 'country': 'ZA'},
     {'latitude': -1.2921, 'longitude': 36.8219, 'name': 'Nairobi', 'country': 'KE'},
     {'latitude': 33.5731, 'longitude': -7.5898, 'name': 'Casablanca', 'country': 'MA'},
+    {'latitude': -33.9249, 'longitude': 18.4241, 'name': 'Cape Town', 'country': 'ZA'},
     {'latitude': -33.8688, 'longitude': 151.2093, 'name': 'Sydney', 'country': 'AU'},
     
     // 새로 추가된 오세아니아 도시들
@@ -550,10 +559,45 @@ class RandomCityProvider {
     {'latitude': -45.0312, 'longitude': 168.6626, 'name': 'Queenstown', 'country': 'NZ'},
   ];
 
+  // 최근에 보여준 도시들을 저장하는 버퍼
+  static final Set<String> _recentlyShownCities = <String>{};
+  
   static Map<String, dynamic> getRandomCity() {
-    final randomIndex = Random().nextInt(_cities.length);
-    return _cities[randomIndex];
+    // 사용 가능한 도시들 (최근에 보여준 도시들 제외)
+    final availableCities = _cities.where((city) {
+      return !_recentlyShownCities.contains(city['name']);
+    }).toList();
+    
+    // 모든 도시가 보여졌다면 버퍼를 리셋
+    if (availableCities.isEmpty) {
+      _recentlyShownCities.clear();
+      // 버퍼 리셋 후 다시 사용 가능한 도시들을 가져옴
+      final allCities = List<Map<String, dynamic>>.from(_cities);
+      final randomIndex = Random().nextInt(allCities.length);
+      final selectedCity = allCities[randomIndex];
+      
+      // 선택된 도시를 버퍼에 추가
+      _recentlyShownCities.add(selectedCity['name']);
+      return selectedCity;
+    }
+    
+    // 사용 가능한 도시 중에서 랜덤 선택
+    final randomIndex = Random().nextInt(availableCities.length);
+    final selectedCity = availableCities[randomIndex];
+    
+    // 선택된 도시를 버퍼에 추가
+    _recentlyShownCities.add(selectedCity['name']);
+    
+    return selectedCity;
   }
 
   static List<Map<String, dynamic>> getAllCities() => List.unmodifiable(_cities);
+  
+  // 버퍼 상태 확인용 메서드 (디버깅/테스트용)
+  static Set<String> getRecentlyShownCities() => Set.unmodifiable(_recentlyShownCities);
+  
+  // 버퍼 수동 리셋 메서드 (필요시 사용)
+  static void resetRecentlyShownBuffer() {
+    _recentlyShownCities.clear();
+  }
 }

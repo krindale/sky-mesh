@@ -67,6 +67,7 @@ class WeatherData {
   final double? longitude;
   final DateTime? sunrise;
   final DateTime? sunset;
+  final int? timezone; // 시간대 오프셋 (초 단위)
 
   /// Creates a new WeatherData instance
   /// 
@@ -92,6 +93,7 @@ class WeatherData {
     this.longitude,
     this.sunrise,
     this.sunset,
+    this.timezone,
   });
 
   /// Creates a WeatherData instance from OpenWeatherMap API JSON response
@@ -107,10 +109,10 @@ class WeatherData {
     final sunsetTimestamp = json['sys']['sunset'];
     
     final sunrise = sunriseTimestamp != null 
-        ? DateTime.fromMillisecondsSinceEpoch(sunriseTimestamp * 1000)
+        ? DateTime.fromMillisecondsSinceEpoch(sunriseTimestamp * 1000, isUtc: true)
         : null;
     final sunset = sunsetTimestamp != null
-        ? DateTime.fromMillisecondsSinceEpoch(sunsetTimestamp * 1000)
+        ? DateTime.fromMillisecondsSinceEpoch(sunsetTimestamp * 1000, isUtc: true)
         : null;
     
     Logger.api('Raw timestamps: sunrise=$sunriseTimestamp, sunset=$sunsetTimestamp');
@@ -141,6 +143,7 @@ class WeatherData {
       longitude: json['coord'] != null ? json['coord']['lon']?.toDouble() : null,
       sunrise: sunrise,
       sunset: sunset,
+      timezone: json['timezone'], // API에서 제공하는 시간대 오프셋 (초 단위)
     );
   }
 
@@ -148,6 +151,21 @@ class WeatherData {
   
   /// Temperature formatted with degree symbol (e.g., "22°")
   String get temperatureString => '${temperature.round()}°';
+  
+  /// 도시의 로컬 시간을 HH:mm 형식으로 반환
+  String get cityLocalTime {
+    if (timezone == null) {
+      // 시간대 정보가 없으면 UTC 기준으로 표시
+      final now = DateTime.now().toUtc();
+      return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    }
+    
+    // UTC 시간에 시간대 오프셋을 추가하여 도시의 로컬 시간 계산
+    final utcNow = DateTime.now().toUtc();
+    final cityTime = utcNow.add(Duration(seconds: timezone!));
+    
+    return '${cityTime.hour.toString().padLeft(2, '0')}:${cityTime.minute.toString().padLeft(2, '0')}';
+  }
   
   /// Feels-like temperature formatted with degree symbol (e.g., "24°")
   String get feelsLikeString => '${feelsLike.round()}°';
