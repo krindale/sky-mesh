@@ -134,7 +134,7 @@ void main() {
 
           final forecast = HourlyWeatherForecast.fromJson(json);
 
-          expect(forecast.dateTime, DateTime.fromMillisecondsSinceEpoch(1705326600 * 1000));
+          expect(forecast.dateTime, DateTime.fromMillisecondsSinceEpoch(1705326600 * 1000, isUtc: true));
           expect(forecast.temperature, 25.3);
           expect(forecast.description, 'light rain');
           expect(forecast.iconCode, '10d');

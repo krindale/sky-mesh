@@ -375,7 +375,15 @@ class WeatherDataFactory {
     );
   }
 
-  HourlyWeatherData createMockHourlyWeatherData() {
+  HourlyWeatherData createMockHourlyWeatherData([String? cityName, String? countryCode]) {
+    // 현재 선택된 도시의 timezone 정보 사용
+    final timezone = (cityName != null && countryCode != null) 
+        ? CityTimezoneProvider.getTimezone(cityName, countryCode)
+        : null;
+    
+    final currentCityName = cityName ?? 'Seoul';
+    final currentCountryCode = countryCode ?? 'KR';
+    
     final now = DateTime.now();
     final hourlyForecasts = <HourlyWeatherForecast>[];
     
@@ -402,13 +410,15 @@ class WeatherDataFactory {
         humidity: 30 + Random().nextInt(60),
         windSpeed: Random().nextDouble() * 8,
         pressure: 980 + Random().nextInt(60),
+        timezone: timezone, // 현재 선택된 도시의 시간대 사용
       ));
     }
     
     return HourlyWeatherData(
-      cityName: 'Seoul',
-      country: 'KR',
+      cityName: currentCityName,
+      country: currentCountryCode,
       hourlyForecasts: hourlyForecasts,
+      timezone: timezone, // 현재 선택된 도시의 시간대 사용
     );
   }
 
@@ -599,5 +609,117 @@ class RandomCityProvider {
   // 버퍼 수동 리셋 메서드 (필요시 사용)
   static void resetRecentlyShownBuffer() {
     _recentlyShownCities.clear();
+  }
+}
+
+/// City timezone provider for all cities with images in the app
+/// 
+/// Provides timezone offset information (seconds from UTC) for all cities
+/// that have image assets in the SkyMesh app.
+class CityTimezoneProvider {
+  static const Map<String, Map<String, int>> _cityTimezones = {
+    // Asia
+    'Seoul': {'KR': 32400}, // UTC+9
+    'Tokyo': {'JP': 32400}, // UTC+9
+    'Osaka': {'JP': 32400}, // UTC+9
+    'Sapporo': {'JP': 32400}, // UTC+9
+    'Beijing': {'CN': 28800}, // UTC+8
+    'Shanghai': {'CN': 28800}, // UTC+8
+    'Bangkok': {'TH': 25200}, // UTC+7
+    'Ho Chi Minh City': {'VN': 25200}, // UTC+7
+    'Singapore': {'SG': 28800}, // UTC+8
+    'Kuala Lumpur': {'MY': 28800}, // UTC+8
+    'Manila': {'PH': 28800}, // UTC+8
+    'Jakarta': {'ID': 25200}, // UTC+7
+    'Bali': {'ID': 28800}, // UTC+8
+    'Phuket': {'TH': 25200}, // UTC+7
+    'Angkor Wat': {'KH': 25200}, // UTC+7
+    'Maldives': {'MV': 18000}, // UTC+5
+    'Bangalore': {'IN': 19800}, // UTC+5:30
+    'Mumbai': {'IN': 19800}, // UTC+5:30
+    'Delhi': {'IN': 19800}, // UTC+5:30
+    'Taipei': {'TW': 28800}, // UTC+8
+
+    // Middle East
+    'Dubai': {'AE': 14400}, // UTC+4
+    'Tehran': {'IR': 16200}, // UTC+4:30
+    'Riyadh': {'SA': 10800}, // UTC+3
+    'Tel Aviv': {'IL': 7200}, // UTC+2
+    'Doha': {'QA': 10800}, // UTC+3
+    'Petra': {'JO': 7200}, // UTC+2
+
+    // Europe
+    'Paris': {'FR': 3600}, // UTC+1
+    'London': {'GB': 0}, // UTC+0
+    'Berlin': {'DE': 3600}, // UTC+1
+    'Rome': {'IT': 3600}, // UTC+1
+    'Amsterdam': {'NL': 3600}, // UTC+1
+    'Barcelona': {'ES': 3600}, // UTC+1
+    'Madrid': {'ES': 3600}, // UTC+1
+    'Milan': {'IT': 3600}, // UTC+1
+    'Prague': {'CZ': 3600}, // UTC+1
+    'Stockholm': {'SE': 3600}, // UTC+1
+    'Vienna': {'AT': 3600}, // UTC+1
+    'Zurich': {'CH': 3600}, // UTC+1
+    'Moscow': {'RU': 10800}, // UTC+3
+    'Istanbul': {'TR': 10800}, // UTC+3
+    'Dubrovnik': {'HR': 3600}, // UTC+1
+    'Zermatt': {'CH': 3600}, // UTC+1
+    'Santorini': {'GR': 7200}, // UTC+2
+
+    // North America
+    'New York': {'US': -18000}, // UTC-5
+    'Los Angeles': {'US': -28800}, // UTC-8
+    'San Francisco': {'US': -28800}, // UTC-8
+    'Seattle': {'US': -28800}, // UTC-8
+    'Chicago': {'US': -21600}, // UTC-6
+    'Boston': {'US': -18000}, // UTC-5
+    'Miami': {'US': -18000}, // UTC-5
+    'Washington DC': {'US': -18000}, // UTC-5
+    'Toronto': {'CA': -18000}, // UTC-5
+    'Vancouver': {'CA': -28800}, // UTC-8
+    'Montreal': {'CA': -18000}, // UTC-5
+    'Mexico City': {'MX': -21600}, // UTC-6
+    'Cancun': {'MX': -18000}, // UTC-5
+    'Aspen': {'US': -25200}, // UTC-7
+
+    // South America
+    'Buenos Aires': {'AR': -10800}, // UTC-3
+    'Rio de Janeiro': {'BR': -10800}, // UTC-3
+    'Santiago': {'CL': -10800}, // UTC-3
+    'São Paulo': {'BR': -10800}, // UTC-3
+    'Bogotá': {'CO': -18000}, // UTC-5
+    'Machu Picchu': {'PE': -18000}, // UTC-5
+
+    // Africa
+    'Cairo': {'EG': 7200}, // UTC+2
+    'Johannesburg': {'ZA': 7200}, // UTC+2
+    'Nairobi': {'KE': 10800}, // UTC+3
+    'Casablanca': {'MA': 0}, // UTC+0
+    'Cape Town': {'ZA': 7200}, // UTC+2
+    'Lagos': {'NG': 3600}, // UTC+1
+
+    // Oceania
+    'Sydney': {'AU': 39600}, // UTC+11
+    'Melbourne': {'AU': 39600}, // UTC+11
+    'Hawaii': {'US': -36000}, // UTC-10
+    'Tahiti': {'PF': -36000}, // UTC-10
+    'Queenstown': {'NZ': 46800}, // UTC+13
+  };
+
+  /// Get timezone offset in seconds from UTC for a city
+  /// Returns null if city is not found
+  static int? getTimezone(String cityName, String countryCode) {
+    return _cityTimezones[cityName]?[countryCode];
+  }
+
+  /// Get all available cities with timezone information
+  static Map<String, Map<String, int>> getAllTimezones() {
+    return Map.unmodifiable(_cityTimezones);
+  }
+
+  /// Check if a city has timezone information
+  static bool hasTimezone(String cityName, String countryCode) {
+    return _cityTimezones[cityName]?.containsKey(countryCode) ?? false;
   }
 }
