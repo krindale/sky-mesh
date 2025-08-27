@@ -7,6 +7,7 @@ class HourlyWeatherForecast {
   final int humidity;
   final double windSpeed;
   final int pressure;
+  final int? timezone; // 시간대 오프셋 (초 단위)
 
   HourlyWeatherForecast({
     required this.dateTime,
@@ -16,9 +17,10 @@ class HourlyWeatherForecast {
     required this.humidity,
     required this.windSpeed,
     required this.pressure,
+    this.timezone,
   });
 
-  factory HourlyWeatherForecast.fromJson(Map<String, dynamic> json) {
+  factory HourlyWeatherForecast.fromJson(Map<String, dynamic> json, {int? timezone}) {
     return HourlyWeatherForecast(
       dateTime: DateTime.fromMillisecondsSinceEpoch(json['dt'] * 1000, isUtc: true),
       temperature: json['main']['temp'].toDouble(),
@@ -27,13 +29,22 @@ class HourlyWeatherForecast {
       humidity: json['main']['humidity'],
       windSpeed: json['wind']['speed'].toDouble(),
       pressure: json['main']['pressure'],
+      timezone: timezone,
     );
   }
 
   String get temperatureString => '${temperature.round()}°';
   String get hour {
-    final localTime = dateTime.toLocal();
-    return '${localTime.hour.toString().padLeft(2, '0')}:${localTime.minute.toString().padLeft(2, '0')}';
+    // 도시의 시간대를 사용하여 로컬 시간 계산
+    DateTime displayTime;
+    if (timezone != null) {
+      // UTC 시간에 시간대 오프셋을 더해서 도시 로컬 시간 계산
+      displayTime = dateTime.add(Duration(seconds: timezone!));
+    } else {
+      // 시간대 정보가 없으면 기기의 로컬 시간 사용 (기존 동작)
+      displayTime = dateTime.toLocal();
+    }
+    return '${displayTime.hour.toString().padLeft(2, '0')}:${displayTime.minute.toString().padLeft(2, '0')}';
   }
   
   String get capitalizedDescription {
@@ -48,23 +59,27 @@ class HourlyWeatherData {
   final String cityName;
   final String country;
   final List<HourlyWeatherForecast> hourlyForecasts;
+  final int? timezone; // 시간대 오프셋 (초 단위)
 
   HourlyWeatherData({
     required this.cityName,
     required this.country,
     required this.hourlyForecasts,
+    this.timezone,
   });
 
   factory HourlyWeatherData.fromJson(Map<String, dynamic> json) {
     final List<dynamic> list = json['list'];
+    final timezone = json['city']['timezone'] as int?; // 시간대 오프셋 (초 단위)
     final hourlyForecasts = list.take(24).map((item) => 
-      HourlyWeatherForecast.fromJson(item)
+      HourlyWeatherForecast.fromJson(item, timezone: timezone)
     ).toList();
     
     return HourlyWeatherData(
       cityName: json['city']['name'],
       country: json['city']['country'],
       hourlyForecasts: hourlyForecasts,
+      timezone: timezone,
     );
   }
 }
